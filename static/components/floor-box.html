@@ -1,0 +1,40 @@
+<link rel="import" href="/static/bower_components/paper-card/paper-card.html">
+<link rel="import" href="/static/bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="/static/bower_components/paper-item/paper-item.html">
+<dom-module id="floor-box">
+  <template>
+    <style>
+:host {
+  box-sizing: border-box;
+  padding: 16px;
+}
+paper-card {
+  --paper-card-content: {
+    padding: 0;
+  }
+}
+    </style>
+    <paper-card >
+      <div class="card-content">
+        <paper-listbox selected="{{floor}}" attr-for-selected="val">
+          <template is="dom-repeat" items="[[floors]]" sort="sort">
+            <paper-item val="[[item]]">[[item]]</paper-item>
+          </template>
+        </paper-listbox>
+      </div>
+  </template>
+  <script>
+Polymer({
+  is: "floor-box",
+  properties: {
+    floor: {
+      type: String,
+      notify: true
+    },
+  },
+  sort: function (a, b) {
+    return a < b;
+  },
+});
+  </script>
+</dom-module>

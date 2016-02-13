@@ -1,0 +1,85 @@
+<link rel="import" href="/static/bower_components/paper-styles/typography.html">
+<link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
+<dom-module id="main-app">
+  <template>
+    <style>
+:host {
+  @apply(--paper-font-body1);
+  padding: 0;
+  margin: 0;
+}
+#map {
+  width: 100vw;
+  height: 100vh;
+}
+search-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 480px;
+  max-width: 100%;
+}
+floor-box {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+    </style>
+    <div id="map"></div>
+    <search-box></search-box>
+    <floor-box floors="[[floors]]" floor="{{floor}}"></floor-box>
+    <iron-ajax
+         auto
+         url="[[floorsURL(bounds)]]"
+         handle-as="json"
+         last-response="{{floors}}"
+         debounce-duration="300"></iron-ajax>
+  </template>
+
+  <script>
+Polymer({
+  is: "main-app",
+  observers: [
+    'refreshTiles(floor)',
+  ],
+  attached: function() {
+    var self = this;
+    this.map = new google.maps.Map(this.$.map, {
+      center: {
+        lat: 49.26119707839249,
+        lng: -123.24878096580505
+      },
+      mapTypeControl: false,
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      zoom: 20
+    });
+    var imageMapType = new google.maps.ImageMapType({
+      getTileUrl: function(coord, zoom) {
+        return ['/tiles/', zoom, '_', coord.x, '_', coord.y, '_', self.floor, '.png'].join('');
+      },
+      tileSize: new google.maps.Size(256, 256)
+    });
+
+    this.map.overlayMapTypes.push(imageMapType);
+    this.map.addListener('bounds_changed', function() {
+      self.bounds = self.map.getBounds();
+    });
+  },
+  refreshTiles: function() {
+    var zoom = this.map.getZoom();
+    this.map.setZoom(zoom+1);
+    this.map.setZoom(zoom);
+  },
+  floorsURL: function(bounds) {
+    var point = {
+      north: bounds.getNorthEast().lat(),
+      east: bounds.getNorthEast().lng(),
+      south: bounds.getSouthWest().lat(),
+      west: bounds.getSouthWest().lng(),
+      zoom: this.map.getZoom(),
+    };
+    return '/floors/'+JSON.stringify(point);
+  },
+});
+  </script>
+</dom-module>

@@ -1,0 +1,33 @@
+<link rel="import" href="/static/bower_components/paper-search/paper-search-bar.html">
+<link rel="import" href="/static/bower_components/paper-card/paper-card.html">
+<dom-module id="search-box">
+  <template>
+    <style>
+:host {
+  box-sizing: border-box;
+  padding: 16px;
+}
+paper-card {
+  width: 100%;
+  --paper-card-content: {
+    padding: 0;
+  }
+}
+    </style>
+    <paper-card >
+      <div class="card-content">
+        <paper-search-bar placeholder="Enter search term" on-paper-search-search="search" on-paper-search-filter="filter"></paper-search-bar>
+      </div>
+  </template>
+  <script>
+Polymer({
+  is: "search-box",
+  search: function() {
+    alert("Searching...");
+  },
+  filter: function() {
+    alert("Filter dialog");
+  },
+});
+  </script>
+</dom-module>
