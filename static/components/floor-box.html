@@ -32,8 +32,16 @@ Polymer({
       notify: true
     },
   },
+  observers: [
+    'updateFloor(floors)',
+  ],
   sort: function (a, b) {
     return a < b;
+  },
+  updateFloor: function(floors) {
+    if (floors.indexOf(this.floor) < 0) {
+      this.floor = floors[0];
+    }
   },
 });
   </script>
