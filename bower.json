@@ -21,6 +21,8 @@
     "paper-search": "~1.0.20",
     "paper-card": "PolymerElements/paper-card#~1.1.1",
     "iron-ajax": "PolymerElements/iron-ajax#~1.1.1",
-    "paper-listbox": "polymerelements/paper-listbox#~1.1.2"
+    "paper-listbox": "polymerelements/paper-listbox#~1.1.2",
+    "paper-radio-button": "PolymerElements/paper-radio-button#~1.0.12",
+    "paper-radio-group": "PolymerElements/paper-radio-group#~1.0.9"
   }
 }

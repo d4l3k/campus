@@ -1,6 +1,10 @@
-<link rel="import" href="/bower_components/paper-search/paper-search-bar.html">
 <link rel="import" href="/bower_components/paper-card/paper-card.html">
+<link rel="import" href="/bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="/bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="/bower_components/paper-search/paper-search-bar.html">
 <link rel="import" href="/bower_components/paper-styles/shadow.html">
+<link rel="import" href="/components/bookable-item.html">
+
 <dom-module id="search-box">
   <template>
     <style>
@@ -15,25 +19,59 @@ paper-card {
     padding: 0;
   }
 }
-paper-search-bar {
+.search {
   @apply(--shadow-elevation-2dp);
+}
+paper-radio-group {
+  width: 100%;
+  text-align: center;
 }
 paper-item {
   cursor: pointer;
 }
+paper-item > div {
+  width: 100%;
+}
+.results {
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+}
     </style>
     <paper-card >
       <div class="card-content">
-        <paper-search-bar placeholder="Enter search term" query="{{query}}"></paper-search-bar>
-        <template is="dom-repeat" items="[[result]]">
-          <paper-item on-tap="select"><span>[[item.Id]]</span>&nbsp;<span>[[item.Name]]</span></paper-item>
-        </template>
+        <div class="search">
+          <paper-search-bar placeholder="Enter search term" query="{{query}}" on-paper-search-filter="filter"></paper-search-bar>
+      <template is="dom-if" if="[[showFilters]]">
+        <paper-radio-group selected="{{typeFilter}}">
+          <paper-radio-button name="all">All</paper-radio-button>
+          <paper-radio-button name="printer">Printers</paper-radio-button>
+          <paper-radio-button name="restroom">Restrooms</paper-radio-button>
+          <paper-radio-button name="food">Food</paper-radio-button>
+          <paper-radio-button name="bookable">Bookable</paper-radio-button>
+        </paper-radio-group>
+      </template>
+        </div>
+        <div class="results">
+          <template is="dom-repeat" items="[[result]]">
+            <paper-item on-tap="select">
+              <div>
+                <span>[[item.Id]]</span>&nbsp;<span>[[item.Name]]</span>
+                <template is="dom-if" if="[[eq(item.Type, 'bookable')]]">
+                  <bookable-item item="{{item}}"></bookable-item>
+                </template>
+                <template is="dom-if" if="[[eq(item.Type, 'building')]]">
+                  <building-item item="{{item}}"></building-item>
+                </template>
+              </div>
+            </paper-item>
+          </template>
+        </div>
       </div>
     </paper-card>
 
     <iron-ajax
          auto
-         url="[[searchURL(query)]]"
+         url="[[searchURL(query, typeFilter)]]"
          handle-as="json"
          last-response="{{result}}"
          debounce-duration="300"></iron-ajax>
@@ -46,6 +84,10 @@ Polymer({
       type: String,
       notify: true,
     },
+    typeFilter: {
+      type: String,
+      value: 'all',
+    },
   },
   observers: [
     'updateQuery(selected)',
@@ -53,16 +95,22 @@ Polymer({
   updateQuery: function(selected) {
     this.query = selected;
   },
-  searchURL: function(query) {
-    if (!query) {
+  searchURL: function(query, type) {
+    if (!query && type === 'all') {
       return;
     }
-    return '/search/'+query;
+    return '/search/?type='+type+'&q='+encodeURIComponent(query);
   },
   select: function(e) {
     var item = e.model.item;
     this.selected = item.Id;
-  }
+  },
+  filter: function() {
+    this.showFilters = !this.showFilters;
+  },
+  eq: function(a, b) {
+    return a == b;
+  },
 });
   </script>
 </dom-module>

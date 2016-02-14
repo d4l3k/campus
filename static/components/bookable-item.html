@@ -1,0 +1,25 @@
+<dom-module id="bookable-item">
+  <template>
+    <style>
+      a {
+        float: right;
+        color: #3367d6;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+    <a target="_blank" href="[[bookingURL(item)]]">Book</a>
+  </template>
+  <script>
+Polymer({
+  is: "bookable-item",
+  properties: {
+  },
+  bookingURL: function(item) {
+    return 'https://my.cs.ubc.ca/space/'+item.Id.replace(/ /g, '');
+  },
+});
+  </script>
+</dom-module>

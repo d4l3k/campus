@@ -5,8 +5,6 @@ import (
 	"log"
 	"os"
 	"sync"
-
-	"github.com/d4l3k/campus/models"
 )
 
 type Building struct {
@@ -19,7 +17,7 @@ type Building struct {
 }
 
 func (b Building) Meta() *Building {
-	return &models.Building{
+	return &Building{
 		Name:     b.Name,
 		SIS:      b.SIS,
 		Position: b.Position,
@@ -102,7 +100,10 @@ type LatLng struct {
 }
 
 type Index struct {
-	Id   string
-	Name string
+	Id    string
+	Name  string
+	Type  string
+	Image string
+
 	Item interface{} `json:"-"`
 }

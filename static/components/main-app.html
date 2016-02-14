@@ -16,7 +16,7 @@ search-box {
   position: absolute;
   top: 0;
   left: 0;
-  width: 480px;
+  width: 520px;
   max-width: 100%;
 }
 floor-box {
@@ -24,9 +24,12 @@ floor-box {
   top: 0;
   right: 0;
 }
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   floor-box {
-    top: 66px;
+    top: auto;
+    right: auto;
+    bottom: 0;
+    left: 0;
   }
 }
     </style>
@@ -66,6 +69,7 @@ Polymer({
         solid: '/img/dot-red.png',
         food: '/img/icons/restaurant.png',
         restroom: '/img/icons/toilets.png',
+        printer: '/img/icons/printer-2.png',
       },
     },
     selectedDetail: {
@@ -137,6 +141,7 @@ Polymer({
     var rooms = view.Rooms;
     var self = this;
     this.clearMarkers();
+    var id = '';
     if (selectedDetail) {
       var marker = new google.maps.Marker({
         position: new google.maps.LatLng(selectedDetail.position.H, selectedDetail.position.L),
@@ -144,6 +149,7 @@ Polymer({
       });
       marker.setMap(self.map);
       self.markers.push(marker);
+      id = ((selectedDetail.sis||'')+' '+(selectedDetail.id||'')).trim();
     }
     if (rooms) {
       rooms.forEach(function(room) {
@@ -151,20 +157,27 @@ Polymer({
         if (!icon) {
           icon = self.icons.default;
         }
+        var code = room.sis + ' ' + room.id;
+        if (selectedDetail && id === code) {
+          return;
+        }
         var marker = new google.maps.Marker({
           position: new google.maps.LatLng(room.position.H, room.position.L),
-          title: room.sis + ' ' + room.id,
+          title: code,
           icon: icon,
         });
         marker.setMap(self.map);
         marker.addListener('click', function() {
-          self.selected = room.sis + ' ' + room.id;
+          self.selected = code;
         });
         self.markers.push(marker);
       });
     }
     if (view.Buildings) {
       view.Buildings.forEach(function(building) {
+        if (selectedDetail && id === building.sis) {
+          return;
+        }
         var marker = new google.maps.Marker({
           position: new google.maps.LatLng(building.position.H, building.position.L),
           title: building.name,
@@ -186,9 +199,12 @@ Polymer({
       this.floor = selectedDetail.floor;
       this.map.setZoom(20);
     } else {
-      this.map.setZoom(18);
+      if (this.map.getZoom() < 18) {
+        this.map.setZoom(18);
+      }
     }
-    this.map.panTo(new google.maps.LatLng(selectedDetail.position.H, selectedDetail.position.L));
+    var selected = new google.maps.LatLng(selectedDetail.position.H, selectedDetail.position.L);
+    this.map.panTo(selected);
   },
   selectedURL: function(selected) {
     if (!selected) {

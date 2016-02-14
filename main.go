@@ -29,7 +29,7 @@ func NewServer() (*Server, error) {
 	s.r = mux.NewRouter()
 	s.r.HandleFunc("/tiles/{zoom}_{x}_{y}_{floor}.png", s.tiles)
 	s.r.HandleFunc("/view/{json}", s.view)
-	s.r.HandleFunc("/search/{json}", s.search)
+	s.r.HandleFunc("/search/", s.search)
 	s.r.HandleFunc("/item/{json}", s.item)
 	s.r.HandleFunc("/dump/", s.dump)
 	s.r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
@@ -67,9 +67,11 @@ func (s *Server) indexBuildings() {
 		idx := &models.Index{
 			Id:   b.SIS,
 			Name: b.Name,
+			Type: "building",
 		}
 		index.Index(b.SIS, idx)
 		idx.Item = b.Meta()
+		idx.Image = b.Image
 		s.idIndex[b.SIS] = idx
 		for _, f := range b.Floors {
 			for _, r := range f.Rooms {
@@ -77,6 +79,7 @@ func (s *Server) indexBuildings() {
 				idx := &models.Index{
 					Id:   id,
 					Name: r.Name,
+					Type: r.Type,
 				}
 				index.Index(id, idx)
 				idx.Item = r
@@ -148,14 +151,30 @@ func (s *Server) item(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) search(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	args := vars["json"]
+	query := r.URL.Query()
 
-	var results []*models.Index
-	if idx, ok := s.idIndex[args]; ok {
+	q := query.Get("q")
+	typeFilter := query.Get("type")
+
+	results := []*models.Index{}
+	if idx, ok := s.idIndex[q]; ok {
 		results = append(results, idx)
 	} else {
-		query := bleve.NewQueryStringQuery(args)
+		query_list := make([]bleve.Query, 2)
+		fuzzy_query := bleve.NewFuzzyQuery(q)
+		fuzzy_query.FuzzinessVal = 3
+		query_list[0] = fuzzy_query
+		query_list[1] = bleve.NewRegexpQuery("[a-zA-Z0-9_]*" + q + "[a-zA-Z0-9_]*")
+
+		var query_must []bleve.Query
+
+		if typeFilter != "all" {
+			termQuery := bleve.NewTermQuery(typeFilter)
+			query_must = append(query_must, termQuery)
+		}
+
+		query := bleve.NewBooleanQuery(query_must, query_list, nil)
+
 		searchRequest := bleve.NewSearchRequest(query)
 		searchResult, err := s.index.Search(searchRequest)
 		if err != nil {
