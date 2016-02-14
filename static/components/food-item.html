@@ -64,6 +64,9 @@ Polymer({
     'updateSchedule(schedule)',
   ],
   scheduleURL: function(item) {
+    if (!item || !item.Name) {
+      return;
+    }
     return '/schedule/'+item.Name.replace(/ /g, '-');
   },
   updateSchedule: function(schedule) {
