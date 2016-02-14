@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/blevesearch/bleve"
 	"github.com/blevesearch/bleve/search"
 	"github.com/d4l3k/campus/models"
@@ -29,6 +30,7 @@ func NewServer() (*Server, error) {
 	s.r = mux.NewRouter()
 	s.r.HandleFunc("/tiles/{zoom}_{x}_{y}_{floor}.png", s.tiles)
 	s.r.HandleFunc("/view/{json}", s.view)
+	s.r.HandleFunc("/schedule/{loc}", s.schedule)
 	s.r.HandleFunc("/search/", s.search)
 	s.r.HandleFunc("/item/{json}", s.item)
 	s.r.HandleFunc("/dump/", s.dump)
@@ -49,6 +51,7 @@ func NewServer() (*Server, error) {
 	return s, nil
 }
 
+// indexBuildings builds the search index as well as a way to look items up by SIS/room number.
 func (s *Server) indexBuildings() {
 	s.idIndex = make(map[string]*models.Index)
 	dir, err := ioutil.TempDir("", "campus")
@@ -137,6 +140,7 @@ type ViewResp struct {
 	Buildings []*models.Building
 }
 
+// item returns a specific search result item.
 func (s *Server) item(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	args := vars["json"]
@@ -151,6 +155,27 @@ func (s *Server) item(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(results.Item)
 }
 
+// schedule returns the schedule for a UBC food services location.
+func (s *Server) schedule(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	args := vars["loc"]
+
+	doc, err := goquery.NewDocument("http://www.food.ubc.ca/place/" + args + "/")
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	schedule, err := doc.Find(".location-hours").Html()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	w.Write([]byte(schedule))
+}
+
+// search executes a search for rooms or buildings.
 func (s *Server) search(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 
@@ -196,6 +221,7 @@ func (s *Server) search(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(results)
 }
 
+// view returns the items that should be displayed to the user.
 func (s *Server) view(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	args := vars["json"]
@@ -240,6 +266,7 @@ func (s *Server) view(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// dump just dumps the entire database.
 func (s *Server) dump(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(s.buildings)

@@ -42,7 +42,11 @@ Polymer({
     'computedStyle(item)',
   ],
   computedStyle: function(item) {
-    console.log('styling!');
+    if (item.Image === "http://www.maps.ubc.ca/PROD/images/photos/photo_na.gif") {
+      this.style.display = 'none';
+    } else {
+      this.style.display = 'block';
+    }
     var url = 'url("' + item.Image + '")';
     this.$.pic.style.backgroundImage = url;
   }

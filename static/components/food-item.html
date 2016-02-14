@@ -1,0 +1,75 @@
+<dom-module id="food-item">
+  <template>
+    <style>
+      #schedule {
+        padding-left: 16px;
+      }
+      /deep/ a {
+        color: #3367d6;
+        text-decoration: none;
+      }
+      /deep/ a:hover {
+        text-decoration: underline;
+      }
+      /deep/ .day {
+        width: 110px;
+        display: inline-block;
+        color: #444;
+      }
+      /deep/  .hours {
+        color: #888;
+      }
+      /deep/ .coh-circle {
+        width: 12px !important;
+        height: 12px;
+        vertical-align: middle;
+        margin-left: 8px;
+        margin-bottom: 4px;
+        border-radius: 15px;
+        -moz-border-radius: 15px;
+        -webkit-border-radius: 15px;
+        display: inline-block;
+        box-shadow: 1px 1px 1px #ddd;
+
+        display: none;
+      }
+      /deep/ .open-today .hours {
+        color: black;
+      }
+      /deep/ .open-today .coh-circle.close {
+        background-color: red;
+        display: inline-block;
+      }
+      /deep/ .open-today .coh-circle.open {
+        background-color: #02d738;
+        display: inline-block;
+      }
+      /deep/ li {
+        list-style-type: none;
+      }
+    </style>
+    <div id="schedule"></div>
+
+    <iron-ajax
+         auto
+         url="[[scheduleURL(item)]]"
+         handle-as="text"
+         last-response="{{schedule}}"
+         debounce-duration="300"></iron-ajax>
+  </template>
+  <script>
+Polymer({
+  is: "food-item",
+  observers: [
+    'updateSchedule(schedule)',
+  ],
+  scheduleURL: function(item) {
+    return '/schedule/'+item.Name.replace(/ /g, '-');
+  },
+  updateSchedule: function(schedule) {
+    this.$.schedule.innerHTML = schedule;
+    this.$.schedule.querySelector('a').setAttribute('target', '_blank');
+  },
+});
+  </script>
+</dom-module>
