@@ -18,6 +18,7 @@ search-box {
   left: 0;
   width: 520px;
   max-width: 100%;
+  z-index: 1;
 }
 floor-box {
   position: absolute;
@@ -30,6 +31,12 @@ floor-box {
     right: auto;
     bottom: 0;
     left: 0;
+  }
+  floor-box /deep/ .card-content {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
   }
 }
     </style>
