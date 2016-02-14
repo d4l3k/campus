@@ -23,6 +23,8 @@ type Server struct {
 	tileCache        *groupcache.Group
 	index            bleve.Index
 	idIndex          map[string]*models.Index
+
+	mapTileReq chan *MapTileRequest
 }
 
 func NewServer() (*Server, error) {
@@ -47,6 +49,7 @@ func NewServer() (*Server, error) {
 	s.indexBuildings()
 
 	s.initCache()
+	s.initTileBuilding()
 
 	return s, nil
 }

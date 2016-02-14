@@ -16,6 +16,8 @@ import (
 	"github.com/nfnt/resize"
 )
 
+const TileWorkers = 4
+
 type zoomedImageGetter struct {
 	s *Server
 }
@@ -113,6 +115,33 @@ type BuildingFloorZoom struct {
 type MapTileRequest struct {
 	X, Y, Z int
 	Floor   string
+
+	resp chan []byte
+	err  chan error
+}
+
+func (s *Server) initTileBuilding() {
+	s.mapTileReq = make(chan *MapTileRequest)
+	for i := 0; i < TileWorkers; i++ {
+		go s.tileWorker()
+	}
+}
+
+func (s *Server) tileWorker() {
+	for req := range s.mapTileReq {
+		buf, err := json.Marshal(req)
+		if err != nil {
+			req.err <- err
+			continue
+		}
+
+		var resp []byte
+		if err := s.tileCache.Get(nil, string(buf), groupcache.AllocatingByteSliceSink(&resp)); err != nil {
+			req.err <- err
+			continue
+		}
+		req.resp <- resp
+	}
 }
 
 func (s *Server) tiles(w http.ResponseWriter, r *http.Request) {
@@ -134,22 +163,25 @@ func (s *Server) tiles(w http.ResponseWriter, r *http.Request) {
 	}
 	floorName := vars["floor"]
 
-	req := &MapTileRequest{x, y, z, floorName}
-	buf, err := json.Marshal(req)
-	if err != nil {
+	req := &MapTileRequest{
+		x, y, z, floorName,
+		make(chan []byte, 1),
+		make(chan error, 1),
+	}
+	defer close(req.resp)
+	defer close(req.err)
+	s.mapTileReq <- req
+
+	select {
+	case err := <-req.err:
 		http.Error(w, err.Error(), 500)
 		return
+	case resp := <-req.resp:
+		w.Header().Set("Content-Type", "image/png")
+		if _, err := w.Write(resp); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 	}
 
-	var resp []byte
-	if err := s.tileCache.Get(nil, string(buf), groupcache.AllocatingByteSliceSink(&resp)); err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
-	w.Header().Set("Content-Type", "image/png")
-	if _, err := w.Write(resp); err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
 }
