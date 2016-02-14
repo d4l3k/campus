@@ -7,6 +7,7 @@
 <link rel="import" href="./bookable-item.html">
 <link rel="import" href="./building-item.html">
 <link rel="import" href="./food-item.html">
+<link rel="import" href="./minimizable-box.html">
 
 <dom-module id="search-box">
   <template>
@@ -94,7 +95,9 @@ paper-item >div > span {
                 </template>
                 <template is="dom-if" if="[[eq(item.Type, 'food')]]">
                   <label>Food</label>
-                  <food-item item="{{item}}"></food-item>
+                  <minimizable-box>
+                    <food-item item="{{item}}"></food-item>
+                  </minimizable-box>
                 </template>
               </div>
             </paper-item>
