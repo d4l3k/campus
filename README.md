@@ -1,6 +1,6 @@
-<h1 style="text-align:center">
+<div style="text-align:center">
   <img src="https://rawgit.com/d4l3k/campus/master/static/logo.png">
-</h1>
+</div>
 
 A interactive map for UBC.
 
