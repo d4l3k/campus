@@ -36,11 +36,21 @@ func fetchDetails(rel <-chan string, out chan *models.Building) {
 		if len(sisBits) > 1 {
 			sis = strings.TrimSpace(sisBits[1])
 		}
+		img := ""
+		doc.Find("#divSiteContent img").Each(func(i int, s *goquery.Selection) {
+			src := s.AttrOr("src", "")
+			if strings.HasPrefix(src, "images/photos/") {
+				img = "http://www.maps.ubc.ca/PROD/" + src
+			}
+		})
+		desc := strings.TrimSpace(doc.Find(".showDetailTD01").Text())
 		log.Printf("Name: %s, Addr: %s, SIS: %s", name, addr, sis)
 		out <- &models.Building{
-			Name:    name,
-			Address: addr,
-			SIS:     sis,
+			Name:        name,
+			Address:     addr,
+			SIS:         sis,
+			Image:       img,
+			Description: desc,
 		}
 	}
 }
@@ -94,6 +104,8 @@ func scrapeBuildings() error {
 		}
 		if b2, ok := buildingIndex[b.SIS]; ok {
 			b2.Address = b.Address
+			b2.Image = b.Image
+			b2.Description = b.Description
 			continue
 		}
 		buildingIndex[b.SIS] = b

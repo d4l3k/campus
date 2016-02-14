@@ -3,7 +3,9 @@
 <link rel="import" href="/bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="/bower_components/paper-search/paper-search-bar.html">
 <link rel="import" href="/bower_components/paper-styles/shadow.html">
+
 <link rel="import" href="/components/bookable-item.html">
+<link rel="import" href="/components/building-item.html">
 
 <dom-module id="search-box">
   <template>
@@ -31,31 +33,51 @@ paper-item {
 }
 paper-item > div {
   width: 100%;
+  padding: 8px 0;
+}
+paper-item label {
+  float: right;
+}
+paper-item >div > span {
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .results {
   max-height: calc(100vh - 140px);
   overflow-y: auto;
 }
+
     </style>
     <paper-card >
       <div class="card-content">
         <div class="search">
           <paper-search-bar placeholder="Enter search term" query="{{query}}" on-paper-search-filter="filter"></paper-search-bar>
-      <template is="dom-if" if="[[showFilters]]">
-        <paper-radio-group selected="{{typeFilter}}">
-          <paper-radio-button name="all">All</paper-radio-button>
-          <paper-radio-button name="printer">Printers</paper-radio-button>
-          <paper-radio-button name="restroom">Restrooms</paper-radio-button>
-          <paper-radio-button name="food">Food</paper-radio-button>
-          <paper-radio-button name="bookable">Bookable</paper-radio-button>
-        </paper-radio-group>
-      </template>
+          <template is="dom-if" if="[[showFilters]]">
+            <paper-radio-group selected="{{typeFilter}}">
+              <paper-radio-button name="all">All</paper-radio-button>
+              <paper-radio-button name="printer">Printers</paper-radio-button>
+              <paper-radio-button name="restroom">Restrooms</paper-radio-button>
+              <paper-radio-button name="food">Food</paper-radio-button>
+              <paper-radio-button name="bookable">Bookable</paper-radio-button>
+            </paper-radio-group>
+          </template>
         </div>
         <div class="results">
           <template is="dom-repeat" items="[[result]]">
             <paper-item on-tap="select">
               <div>
                 <span>[[item.Id]]</span>&nbsp;<span>[[item.Name]]</span>
+
+                <template is="dom-if" if="[[eq(item.Type, 'restroom')]]">
+                  <label>Restroom</label>
+                </template>
+                <template is="dom-if" if="[[eq(item.Type, 'printer')]]">
+                  <label>Printer</label>
+                </template>
+                <template is="dom-if" if="[[eq(item.Type, 'food')]]">
+                  <label>Food</label>
+                </template>
+
                 <template is="dom-if" if="[[eq(item.Type, 'bookable')]]">
                   <bookable-item item="{{item}}"></bookable-item>
                 </template>

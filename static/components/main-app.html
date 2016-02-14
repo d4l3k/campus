@@ -197,7 +197,9 @@ Polymer({
     }
     if (selectedDetail.floor) {
       this.floor = selectedDetail.floor;
-      this.map.setZoom(20);
+      if (this.map.getZoom() < 20) {
+        this.map.setZoom(20);
+      }
     } else {
       if (this.map.getZoom() < 18) {
         this.map.setZoom(18);

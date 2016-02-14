@@ -65,9 +65,10 @@ func (s *Server) indexBuildings() {
 	s.index = index
 	for _, b := range s.buildings {
 		idx := &models.Index{
-			Id:   b.SIS,
-			Name: b.Name,
-			Type: "building",
+			Id:          b.SIS,
+			Name:        b.Name,
+			Type:        "building",
+			Description: b.Description,
 		}
 		index.Index(b.SIS, idx)
 		idx.Item = b.Meta()
@@ -160,22 +161,26 @@ func (s *Server) search(w http.ResponseWriter, r *http.Request) {
 	if idx, ok := s.idIndex[q]; ok {
 		results = append(results, idx)
 	} else {
-		query_list := make([]bleve.Query, 2)
-		fuzzy_query := bleve.NewFuzzyQuery(q)
-		fuzzy_query.FuzzinessVal = 3
-		query_list[0] = fuzzy_query
-		query_list[1] = bleve.NewRegexpQuery("[a-zA-Z0-9_]*" + q + "[a-zA-Z0-9_]*")
-
-		var query_must []bleve.Query
-
-		if typeFilter != "all" {
-			termQuery := bleve.NewTermQuery(typeFilter)
-			query_must = append(query_must, termQuery)
+		var queryShould []bleve.Query
+		if len(q) > 0 {
+			/*fuzzy_query := bleve.NewFuzzyQuery(q)
+			fuzzy_query.FuzzinessVal = 3
+			queryShould = append(queryShould, fuzzy_query)
+			queryShould = append(queryShould, bleve.NewRegexpQuery("[a-zA-Z0-9_]*"+q+"[a-zA-Z0-9_]*"))
+			queryShould = append(queryShould, bleve.NewQueryStringQuery(q))*/
+			queryShould = append(queryShould, bleve.NewQueryStringQuery(q))
 		}
 
-		query := bleve.NewBooleanQuery(query_must, query_list, nil)
+		var queryMust []bleve.Query
+		if typeFilter != "all" {
+			termQuery := bleve.NewTermQuery(typeFilter)
+			queryMust = append(queryMust, termQuery)
+		}
+
+		query := bleve.NewBooleanQuery(queryMust, queryShould, nil)
 
 		searchRequest := bleve.NewSearchRequest(query)
+		searchRequest.Size = 25
 		searchResult, err := s.index.Search(searchRequest)
 		if err != nil {
 			http.Error(w, err.Error(), 500)

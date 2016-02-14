@@ -8,12 +8,13 @@ import (
 )
 
 type Building struct {
-	Floors   []*Floor `json:"floors"`
-	Name     string   `json:"name"`
-	SIS      string   `json:"sis"`
-	Position *LatLng  `json:"position"`
-	Address  string
-	Image    string
+	Floors      []*Floor `json:"floors"`
+	Name        string   `json:"name"`
+	SIS         string   `json:"sis"`
+	Position    *LatLng  `json:"position"`
+	Address     string
+	Image       string
+	Description string
 }
 
 func (b Building) Meta() *Building {
@@ -100,10 +101,11 @@ type LatLng struct {
 }
 
 type Index struct {
-	Id    string
-	Name  string
-	Type  string
-	Image string
+	Id          string
+	Name        string
+	Type        string
+	Image       string
+	Description string
 
 	Item interface{} `json:"-"`
 }

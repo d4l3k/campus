@@ -1,0 +1,46 @@
+<dom-module id="building-item">
+  <template>
+    <style>
+:host {
+  display: block;
+  margin: 0 -16px;
+  margin-top: -22px;
+}
+#pic {
+  min-height: 200px;
+  background-size: cover;
+  position: relative;
+  background-position: center center;
+}
+#pic > div {
+  position: absolute;
+  bottom: 0;
+  padding: 8px 16px;
+  display: inline-block;
+  color: white;
+  text-shadow: black 0px 1px 4px;
+}
+    </style>
+    <div id="pic">
+      <div>
+        <span>[[item.Id]]</span>
+        <span>[[item.Name]]</span>
+      </div>
+    </div>
+  </template>
+  <script>
+Polymer({
+  is: "building-item",
+  properties: {
+  },
+  observers: [
+    'computedStyle(item)',
+  ],
+  computedStyle: function(item) {
+    console.log('styling!');
+    var url = 'url("' + item.Image + '")';
+    this.$.pic.style.backgroundImage = url;
+  }
+});
+  </script>
+</dom-module>
