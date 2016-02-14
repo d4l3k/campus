@@ -1,6 +1,6 @@
-<div style="text-align:center">
-# ![Campus UBC](https://rawgit.com/d4l3k/campus/master/static/logo.png)
-</div>
+<h1 style="text-align:center">
+  <img src="https://rawgit.com/d4l3k/campus/master/static/logo.png">
+</h1>
 
 A interactive map for UBC.
 
