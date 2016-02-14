@@ -71,7 +71,10 @@ Polymer({
   },
   updateSchedule: function(schedule) {
     this.$.schedule.innerHTML = schedule;
-    this.$.schedule.querySelector('a').setAttribute('target', '_blank');
+    var a = this.$.schedule.querySelector('a');
+    if (a) {
+      a.setAttribute('target', '_blank');
+    }
   },
 });
   </script>

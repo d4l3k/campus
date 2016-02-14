@@ -10,6 +10,7 @@
   min-height: 200px;
   background-size: cover;
   position: relative;
+  background-color: #444;
   background-position: center center;
 }
 @media (max-width:600px) {
@@ -42,7 +43,7 @@ Polymer({
     'computedStyle(item)',
   ],
   computedStyle: function(item) {
-    if (item.Image === "http://www.maps.ubc.ca/PROD/images/photos/photo_na.gif") {
+    if (!item.Image || item.Image === "http://www.maps.ubc.ca/PROD/images/photos/photo_na.gif") {
       this.style.display = 'none';
     } else {
       this.style.display = 'block';

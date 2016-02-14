@@ -14,7 +14,7 @@
     <style>
 :host {
   box-sizing: border-box;
-  padding: 16px;
+  padding: 10px;
   overflow: hidden;
 }
 paper-card {
@@ -82,21 +82,21 @@ paper-item >div > span {
                   <span>[[item.Id]]</span>&nbsp;<span>[[item.Name]]</span>
                 </span>
 
-                <template is="dom-if" if="[[eq(item.Type, 'restroom')]]">
+                <template is="dom-if" if="[[type(item, 'restroom')]]">
                   <label>Restroom</label>
                 </template>
-                <template is="dom-if" if="[[eq(item.Type, 'printer')]]">
+                <template is="dom-if" if="[[type(item, 'printer')]]">
                   <label>Printer</label>
                 </template>
 
-                <template is="dom-if" if="[[eq(item.Type, 'bookable')]]">
+                <template is="dom-if" if="[[type(item, 'bookable')]]">
                   <bookable-item item="{{item}}"></bookable-item>
                 </template>
-                <template is="dom-if" if="[[eq(item.Type, 'building')]]">
+                <template is="dom-if" if="[[type(item, 'building')]]">
                   <label>Building</label>
                   <building-item item="{{item}}"></building-item>
                 </template>
-                <template is="dom-if" if="[[eq(item.Type, 'food')]]">
+                <template is="dom-if" if="[[type(item, 'food')]]">
                   <label>Food</label>
                   <minimizable-box>
                     <food-item item="{{item}}"></food-item>
@@ -144,12 +144,18 @@ Polymer({
   select: function(e) {
     var item = e.model.item;
     this.selected = item.Id;
+    if (window.innerWidth < 600) {
+      this.showFilters = false;
+    }
   },
   filter: function() {
     this.showFilters = !this.showFilters;
   },
   eq: function(a, b) {
-    return a == b;
+    return a === b;
+  },
+  type: function(item, type) {
+    return item.Type === type;
   },
 });
   </script>
