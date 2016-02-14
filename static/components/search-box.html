@@ -1,11 +1,13 @@
-<link rel="import" href="/static/bower_components/paper-search/paper-search-bar.html">
-<link rel="import" href="/static/bower_components/paper-card/paper-card.html">
+<link rel="import" href="/bower_components/paper-search/paper-search-bar.html">
+<link rel="import" href="/bower_components/paper-card/paper-card.html">
+<link rel="import" href="/bower_components/paper-styles/shadow.html">
 <dom-module id="search-box">
   <template>
     <style>
 :host {
   box-sizing: border-box;
   padding: 16px;
+  overflow: hidden;
 }
 paper-card {
   width: 100%;
@@ -13,21 +15,54 @@ paper-card {
     padding: 0;
   }
 }
+paper-search-bar {
+  @apply(--shadow-elevation-2dp);
+}
+paper-item {
+  cursor: pointer;
+}
     </style>
     <paper-card >
       <div class="card-content">
-        <paper-search-bar placeholder="Enter search term" on-paper-search-search="search" on-paper-search-filter="filter"></paper-search-bar>
+        <paper-search-bar placeholder="Enter search term" query="{{query}}"></paper-search-bar>
+        <template is="dom-repeat" items="[[result]]">
+          <paper-item on-tap="select"><span>[[item.Id]]</span>&nbsp;<span>[[item.Name]]</span></paper-item>
+        </template>
       </div>
+    </paper-card>
+
+    <iron-ajax
+         auto
+         url="[[searchURL(query)]]"
+         handle-as="json"
+         last-response="{{result}}"
+         debounce-duration="300"></iron-ajax>
   </template>
   <script>
 Polymer({
   is: "search-box",
-  search: function() {
-    alert("Searching...");
+  properties: {
+    selected: {
+      type: String,
+      notify: true,
+    },
   },
-  filter: function() {
-    alert("Filter dialog");
+  observers: [
+    'updateQuery(selected)',
+  ],
+  updateQuery: function(selected) {
+    this.query = selected;
   },
+  searchURL: function(query) {
+    if (!query) {
+      return;
+    }
+    return '/search/'+query;
+  },
+  select: function(e) {
+    var item = e.model.item;
+    this.selected = item.Id;
+  }
 });
   </script>
 </dom-module>

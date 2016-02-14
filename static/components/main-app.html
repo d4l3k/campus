@@ -1,5 +1,5 @@
-<link rel="import" href="/static/bower_components/paper-styles/typography.html">
-<link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/paper-styles/typography.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
 <dom-module id="main-app">
   <template>
     <style>
@@ -24,34 +24,78 @@ floor-box {
   top: 0;
   right: 0;
 }
+@media (max-width: 500px) {
+  floor-box {
+    top: 66px;
+  }
+}
     </style>
     <div id="map"></div>
-    <search-box></search-box>
-    <floor-box floors="[[floors]]" floor="{{floor}}"></floor-box>
+    <search-box selected="{{selected}}"></search-box>
+    <floor-box floors="[[view.Floors]]" floor="{{floor}}"></floor-box>
     <iron-ajax
          auto
-         url="[[floorsURL(bounds)]]"
+         url="[[viewURL(bounds, floor)]]"
          handle-as="json"
-         last-response="{{floors}}"
+         last-response="{{view}}"
+         debounce-duration="300"></iron-ajax>
+
+    <iron-ajax
+         auto
+         url="[[selectedURL(selected)]]"
+         handle-as="json"
+         last-response="{{selectedDetail}}"
          debounce-duration="300"></iron-ajax>
   </template>
 
   <script>
 Polymer({
   is: "main-app",
+  properties: {
+    floor: {
+      type: String,
+    },
+    markers: {
+      type: Array,
+      value: function(){return [];},
+    },
+    icons: {
+      type: Object,
+      value: {
+        default: '/img/dot-red-transparent.png',
+        solid: '/img/dot-red.png',
+        food: '/img/icons/restaurant.png',
+        restroom: '/img/icons/toilets.png',
+      },
+    },
+    selectedDetail: {
+      type: Object,
+      value: null,
+    },
+    view: {
+      type: Object,
+    }
+  },
   observers: [
     'refreshTiles(floor)',
+    'updateMarkers(view, selectedDetail)',
+    'updateHash(selected)',
+    'focusSelected(selectedDetail)',
   ],
+  updateHash: function(selected) {
+    window.location.hash = selected.replace(/ /g, '+');
+  },
   attached: function() {
     var self = this;
+    this.selected = window.location.hash.substr(1).replace(/\+/g, ' ');
     this.map = new google.maps.Map(this.$.map, {
       center: {
-        lat: 49.26119707839249,
-        lng: -123.24878096580505
+        lat: 49.2606052,
+        lng: -123.2459939
       },
       mapTypeControl: false,
       mapTypeId: google.maps.MapTypeId.ROADMAP,
-      zoom: 20
+      zoom: 15
     });
     var imageMapType = new google.maps.ImageMapType({
       getTileUrl: function(coord, zoom) {
@@ -64,21 +108,93 @@ Polymer({
     this.map.addListener('bounds_changed', function() {
       self.bounds = self.map.getBounds();
     });
+    self.floor = '1';
   },
   refreshTiles: function() {
     var zoom = this.map.getZoom();
     this.map.setZoom(zoom+1);
     this.map.setZoom(zoom);
+    this.clearMarkers();
   },
-  floorsURL: function(bounds) {
+  viewURL: function(bounds, floor) {
     var point = {
       north: bounds.getNorthEast().lat(),
       east: bounds.getNorthEast().lng(),
       south: bounds.getSouthWest().lat(),
       west: bounds.getSouthWest().lng(),
       zoom: this.map.getZoom(),
+      floor: floor,
     };
-    return '/floors/'+JSON.stringify(point);
+    return '/view/'+JSON.stringify(point);
+  },
+  clearMarkers: function() {
+    this.markers.forEach(function(marker) {
+      marker.setMap(null);
+    });
+    this.markers = [];
+  },
+  updateMarkers: function(view, selectedDetail) {
+    var rooms = view.Rooms;
+    var self = this;
+    this.clearMarkers();
+    if (selectedDetail) {
+      var marker = new google.maps.Marker({
+        position: new google.maps.LatLng(selectedDetail.position.H, selectedDetail.position.L),
+        title: this.id,
+      });
+      marker.setMap(self.map);
+      self.markers.push(marker);
+    }
+    if (rooms) {
+      rooms.forEach(function(room) {
+        var icon = self.icons[room.type];
+        if (!icon) {
+          icon = self.icons.default;
+        }
+        var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(room.position.H, room.position.L),
+          title: room.sis + ' ' + room.id,
+          icon: icon,
+        });
+        marker.setMap(self.map);
+        marker.addListener('click', function() {
+          self.selected = room.sis + ' ' + room.id;
+        });
+        self.markers.push(marker);
+      });
+    }
+    if (view.Buildings) {
+      view.Buildings.forEach(function(building) {
+        var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(building.position.H, building.position.L),
+          title: building.name,
+          icon: self.icons.solid,
+        });
+        marker.setMap(self.map);
+        marker.addListener('click', function() {
+          self.selected = building.sis;
+        });
+        self.markers.push(marker);
+      });
+    }
+  },
+  focusSelected: function(selectedDetail) {
+    if (!selectedDetail) {
+      return;
+    }
+    if (selectedDetail.floor) {
+      this.floor = selectedDetail.floor;
+      this.map.setZoom(20);
+    } else {
+      this.map.setZoom(18);
+    }
+    this.map.panTo(new google.maps.LatLng(selectedDetail.position.H, selectedDetail.position.L));
+  },
+  selectedURL: function(selected) {
+    if (!selected) {
+      return;
+    }
+    return '/item/'+selected;
   },
 });
   </script>

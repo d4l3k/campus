@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/d4l3k/campus/models"
 	"github.com/golang/groupcache"
 	"github.com/gorilla/mux"
 	"github.com/nfnt/resize"
@@ -24,19 +25,22 @@ func (g zoomedImageGetter) Get(ctx groupcache.Context, key string, dest groupcac
 	if err := json.Unmarshal([]byte(key), bfz); err != nil {
 		return err
 	}
+
 	floor := g.s.GetBuildingFloor(bfz.Building, bfz.Floor)
 	img, err := floor.LoadImage()
 	if err != nil {
 		return err
 	}
-	coords := ctx.(*Coords)
+	coords := ctx.(*models.Coords)
 	latDiff := coords.North - coords.South
 	lngDiff := coords.East - coords.West
-	pixelsPerLongitude := 256 / (lngDiff)
-	pixelsPerLatitude := 256 / (latDiff)
+	pixelsPerLongitude := TileSize / (lngDiff)
+	pixelsPerLatitude := TileSize / (latDiff)
 	newWidth := (floor.Coords.East - floor.Coords.West) * pixelsPerLongitude
 	newHeight := (floor.Coords.North - floor.Coords.South) * pixelsPerLatitude
-	log.Printf("Resizing to %f %f", newWidth, newHeight)
+
+	log.Printf("Generating resized image %f %f", newWidth, newHeight)
+
 	resizedImg := resize.Resize(uint(newWidth), uint(newHeight), img, resize.NearestNeighbor)
 	var buf bytes.Buffer
 	if err := png.Encode(&buf, resizedImg); err != nil {
@@ -58,16 +62,15 @@ func (g mapTileGetter) Get(ctx groupcache.Context, key string, dest groupcache.S
 	point := tileToPoint(req.X, req.Y, req.Z)
 	pointBottom := tileToPoint(req.X+1, req.Y+1, req.Z)
 	log.Printf("Map tile req %+v %+v %+v", req, point, pointBottom)
-	coords := &Coords{
+	coords := &models.Coords{
 		North: point.Lat(),
 		South: pointBottom.Lat(),
 		West:  point.Lng(),
 		East:  pointBottom.Lng(),
 	}
-	buildings := g.s.overlappingPeers(coords)
-	log.Printf("Buildings len = %d", len(buildings))
+	buildings := g.s.OverlappingBuildings(coords)
 
-	m := image.NewNRGBA(image.Rect(0, 0, 256, 256))
+	m := image.NewNRGBA(image.Rect(0, 0, TileSize, TileSize))
 
 	for _, building := range buildings {
 		for _, floor := range building.Floors {
@@ -88,10 +91,10 @@ func (g mapTileGetter) Get(ctx groupcache.Context, key string, dest groupcache.S
 				return err
 			}
 			rect := resizedImg.Bounds()
-			x := float64(rect.Dx()) - float64(rect.Dx())/(floor.Coords.East-floor.Coords.West)*(floor.Coords.East-coords.East)
+			x := float64(rect.Dx()) - float64(rect.Dx())/(floor.Coords.East-floor.Coords.West)*(floor.Coords.East-coords.East) - TileSize
 			y := float64(rect.Dy()) / (floor.Coords.North - floor.Coords.South) * (floor.Coords.North - coords.North)
 			sp := image.Pt(int(x), int(y))
-			draw.Draw(m, image.Rect(0, 0, 256, 256), resizedImg, sp, draw.Over)
+			draw.Draw(m, image.Rect(0, 0, TileSize, TileSize), resizedImg, sp, draw.Over)
 		}
 	}
 

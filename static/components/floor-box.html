@@ -1,6 +1,6 @@
-<link rel="import" href="/static/bower_components/paper-card/paper-card.html">
-<link rel="import" href="/static/bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="/static/bower_components/paper-item/paper-item.html">
+<link rel="import" href="/bower_components/paper-card/paper-card.html">
+<link rel="import" href="/bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="/bower_components/paper-item/paper-item.html">
 <dom-module id="floor-box">
   <template>
     <style>
@@ -39,6 +39,9 @@ Polymer({
     return a < b;
   },
   updateFloor: function(floors) {
+    if (!floors) {
+      return;
+    }
     if (floors.indexOf(this.floor) < 0) {
       this.floor = floors[0];
     }

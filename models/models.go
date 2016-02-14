@@ -1,17 +1,33 @@
-package main
+package models
 
 import (
 	"image"
 	"log"
 	"os"
 	"sync"
+
+	"github.com/d4l3k/campus/models"
 )
 
 type Building struct {
-	Floors []*Floor `json:"floors"`
-	Name   string   `json:"name"`
-	SIS    string   `json:"sis"`
+	Floors   []*Floor `json:"floors"`
+	Name     string   `json:"name"`
+	SIS      string   `json:"sis"`
+	Position *LatLng  `json:"position"`
+	Address  string
+	Image    string
 }
+
+func (b Building) Meta() *Building {
+	return &models.Building{
+		Name:     b.Name,
+		SIS:      b.SIS,
+		Position: b.Position,
+		Address:  b.Address,
+		Image:    b.Image,
+	}
+}
+
 type Floor struct {
 	Name   string  `json:"floor"`
 	Coords *Coords `json:"coords"`
@@ -59,20 +75,34 @@ type Coords struct {
 type ZoomableCoord struct {
 	*Coords
 
-	Zoom int `json:"zoom"`
+	Zoom  int    `json:"zoom"`
+	Floor string `json:"floor"`
 }
 
 func (c Coords) Overlap(c2 *Coords) bool {
 	return c.West < c2.East && c.East > c2.West && c.North > c2.South && c.South < c2.North
 }
 
+func (c Coords) OverlapLatLng(p *LatLng) bool {
+	return c.West < p.Lng && c.East > p.Lng && c.North > p.Lat && c.South < p.Lat
+}
+
 type Room struct {
 	Id       string  `json:"id"`
+	SIS      string  `json:"sis"`
 	Name     string  `json:"name"`
 	Position *LatLng `json:"position"`
+	Type     string  `json:"type"`
+	Floor    string  `json:"floor"`
 }
 
 type LatLng struct {
 	Lat float64 `json:"H"`
 	Lng float64 `json:"L"`
+}
+
+type Index struct {
+	Id   string
+	Name string
+	Item interface{} `json:"-"`
 }

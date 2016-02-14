@@ -24,3 +24,4 @@ _testmain.go
 *.prof
 
 static/bower_components
+campus
