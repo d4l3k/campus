@@ -1,0 +1,128 @@
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-drawer-panel/paper-drawer-panel.html">
+<link rel="import" href="../bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+<link rel="import" href="../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<dom-module id="edit-map">
+  <template>
+    <style>
+:host {
+  @apply(--paper-font-body1);
+  padding: 0;
+  margin: 0;
+}
+#floor {
+  overflow-y: auto;
+}
+#floor img {
+  max-width: 100%;
+}
+    #map {
+      position: relative;
+    }
+    .marker {
+      position: absolute;
+      height: 10px;
+      width: 10px;
+      border-radius: 10000px;
+      background-color: red;
+    }
+    </style>
+    <paper-drawer-panel>
+      <paper-header-panel drawer>
+        <paper-toolbar>
+          <div>Application</div>
+        </paper-toolbar>
+        <div>
+          <paper-menu on-iron-select="select" selected="{{selectedIndex}}">
+            <template is="dom-repeat" items="{{buildings}}">
+              <paper-item>{{item.sis}}</paper-item>
+            </template>
+          </paper-menu>
+        </div>
+      </paper-header-panel>
+      <paper-header-panel main>
+        <paper-toolbar>
+          <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
+          <div>{{selected.name}}</div>
+        </paper-toolbar>
+        <div>
+          <paper-drawer-panel>
+            <div drawer>
+              <paper-icon-button icon="add" on-tap="newFloor"></paper-icon-button>
+              <paper-menu on-iron-select="selectFloor" selected="{{floorIndex}}">
+                <template is="dom-repeat" items="{{selected.floors}}">
+                  <paper-item>{{item.floor}}</paper-item>
+                </template>
+              </paper-menu>
+            </div>
+            <div main id="floor">
+              <paper-input label="Floor Name" value="{{floor.floor}}"></paper-input>
+              <paper-input label="Image URL" value="{{floor.image}}"></paper-input>
+              <div id="map">
+                <img src="[[floor.image]]">
+                <template is="dom-repeat" items="{{floor.rooms}}">
+                  <div class="marker" style$="[[markerPos(floor, item)]]"></div>
+                </template>
+              </div>
+            </div>
+          </paper-drawer-panel>
+        </div>
+      </paper-header-panel>
+    </paper-drawer-panel>
+    <iron-ajax
+         auto
+         url="/dump/"
+         handle-as="json"
+         last-response="{{buildings}}"
+         debounce-duration="300"></iron-ajax>
+  </template>
+
+  <script>
+Polymer({
+  is: "edit-map",
+  properties: {
+    buildings: {
+      type: Array,
+      value: null,
+    },
+  },
+  select: function(e) {
+    this.selected = this.buildings[this.selectedIndex];
+  },
+  selectFloor: function(e) {
+    this.floor = this.selected.floors[this.floorIndex];
+  },
+  newFloor: function() {
+    if (!this.selected) {
+      return;
+    }
+    var pos = this.selected.position;
+    var floor = {
+      floor: 'Unnamed',
+      image: '',
+      rooms: [],
+      coords: {
+        north: pos.H + 0.001,
+        south: pos.H - 0.001,
+        east: pos.L + 0.001,
+        west: pos.L - 0.001,
+      }
+    };
+    if (!this.selected.floors) {
+      this.set('selected.floors', [floor]);
+    } else {
+      this.push('selected.floors', floor);
+    }
+  },
+  markerPos: function(item) {
+    return 'left: 10px; top: 10px;';
+  }
+});
+  </script>
+</dom-module>
