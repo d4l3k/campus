@@ -1,17 +1,35 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"flag"
 	"io/ioutil"
 	"log"
 	"net/http"
 
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+
+	"google.golang.org/api/googleapi/transport"
+	"google.golang.org/api/vision/v1"
+
 	"github.com/PuerkitoBio/goquery"
+	"github.com/abbot/go-http-auth"
 	"github.com/blevesearch/bleve"
 	"github.com/blevesearch/bleve/search"
 	"github.com/d4l3k/campus/models"
 	"github.com/golang/groupcache"
 	"github.com/gorilla/mux"
+)
+
+var (
+	adminPassword      = flag.String("pass", "", "the md5 hash of the admin password")
+	googleAPIKey       = flag.String("key", "", "the Google Vision API key")
+	googleClientID     = flag.String("clientID", "", "the Google Vision API client id")
+	googleClientSecret = flag.String("clientSecret", "", "the Google Vision API client secret")
+	cacheToken         = flag.Bool("cachetoken", true, "cache the OAuth 2.0 token")
 )
 
 const TileSize = 256
@@ -23,19 +41,34 @@ type Server struct {
 	tileCache        *groupcache.Group
 	index            bleve.Index
 	idIndex          map[string]*models.Index
+	authenticator    auth.AuthenticatorInterface
 
 	mapTileReq chan *MapTileRequest
 }
 
 func NewServer() (*Server, error) {
+	flag.Parse()
+
+	if len(*adminPassword) == 0 {
+		log.Println("Warning: no admin password; login impossible")
+	}
+	if len(*googleAPIKey) == 0 {
+		log.Println("Warning: no google api key; OCR impossible")
+	}
+
 	s := &Server{}
+
+	s.authenticator = auth.NewBasicAuthenticator("localhost", s.secret)
+
 	s.r = mux.NewRouter()
-	s.r.HandleFunc("/tiles/{zoom}_{x}_{y}_{floor}.png", s.tiles)
-	s.r.HandleFunc("/view/{json}", s.view)
-	s.r.HandleFunc("/schedule/{loc}", s.schedule)
-	s.r.HandleFunc("/search/", s.search)
-	s.r.HandleFunc("/item/{json}", s.item)
-	s.r.HandleFunc("/dump/", s.dump)
+	s.r.HandleFunc("/api/tiles/{zoom}_{x}_{y}_{floor}.png", s.tiles)
+	s.r.HandleFunc("/api/view/{json}", s.view)
+	s.r.HandleFunc("/api/schedule/{loc}", s.schedule)
+	s.r.HandleFunc("/api/search/", s.search)
+	s.r.HandleFunc("/api/item/{json}", s.item)
+	s.r.HandleFunc("/api/dump/", s.dump)
+	s.r.HandleFunc("/api/save_building/", s.authenticator.Wrap(s.saveBuilding))
+	s.r.HandleFunc("/api/ocr/", s.authenticator.Wrap(s.ocrFloor))
 	s.r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
 	http.Handle("/", s.r)
 
@@ -52,6 +85,13 @@ func NewServer() (*Server, error) {
 	s.initTileBuilding()
 
 	return s, nil
+}
+
+func (s Server) secret(user, realm string) string {
+	if user == "admin" {
+		return *adminPassword
+	}
+	return ""
 }
 
 // indexBuildings builds the search index as well as a way to look items up by SIS/room number.
@@ -141,6 +181,82 @@ type ViewResp struct {
 	Floors    []string
 	Rooms     []*models.Room
 	Buildings []*models.Building
+}
+
+// saveBuilding saves the changes made to a building.
+func (s *Server) saveBuilding(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
+	b := &models.Building{}
+	if err := json.NewDecoder(r.Body).Decode(b); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	for i, b2 := range s.buildings {
+		if b2.SIS != b.SIS {
+			continue
+		}
+		s.buildings[i] = b
+		if err := models.SaveMapData(s.buildings); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(s.buildings[i])
+		return
+	}
+	http.Error(w, "building SIS not found", 404)
+}
+
+// ocrFloor runs google OCR on the floor image for text analysis.
+func (s *Server) ocrFloor(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
+	floor := &models.Floor{}
+	if err := json.NewDecoder(r.Body).Decode(floor); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	bytes, err := ioutil.ReadFile("static/" + floor.Image)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	var config = &oauth2.Config{
+		ClientID:     *googleClientID,
+		ClientSecret: *googleClientSecret,
+		Endpoint:     google.Endpoint,
+		Scopes:       []string{vision.CloudPlatformScope},
+	}
+	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
+		Transport: &transport.APIKey{Key: *googleAPIKey},
+	})
+	client := newOAuthClient(ctx, config)
+	service, err := vision.New(client)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	req := &vision.BatchAnnotateImagesRequest{
+		Requests: []*vision.AnnotateImageRequest{
+			{
+				Features: []*vision.Feature{
+					{
+						Type: "TEXT_DETECTION",
+					},
+				},
+				Image: &vision.Image{
+					Content: base64.StdEncoding.EncodeToString(bytes),
+				},
+			},
+		},
+	}
+	log.Printf("calling annotate")
+	call := service.Images.Annotate(req)
+	resp, err := call.Do()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	log.Printf("OCR %+v", resp)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp.Responses)
 }
 
 // item returns a specific search result item.

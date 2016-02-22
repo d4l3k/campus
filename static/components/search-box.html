@@ -139,7 +139,7 @@ Polymer({
     if (!query && type === 'all') {
       return;
     }
-    return '/search/?type='+type+'&q='+encodeURIComponent(query);
+    return '/api/search/?type='+type+'&q='+encodeURIComponent(query);
   },
   select: function(e) {
     var item = e.model.item;

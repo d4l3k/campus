@@ -3,6 +3,7 @@
 <link rel="import" href="../bower_components/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-styles/typography.html">
@@ -20,7 +21,7 @@
   overflow-y: auto;
 }
 #floor img {
-  max-width: 100%;
+  width: 100%;
 }
     #map {
       position: relative;
@@ -29,14 +30,18 @@
       position: absolute;
       height: 10px;
       width: 10px;
+      margin: -5px;
       border-radius: 10000px;
       background-color: red;
+    }
+    .room {
+      padding: 10px;
     }
     </style>
     <paper-drawer-panel>
       <paper-header-panel drawer>
         <paper-toolbar>
-          <div>Application</div>
+          <div>Campus Edit</div>
         </paper-toolbar>
         <div>
           <paper-menu on-iron-select="select" selected="{{selectedIndex}}">
@@ -55,21 +60,42 @@
           <paper-drawer-panel>
             <div drawer>
               <paper-icon-button icon="add" on-tap="newFloor"></paper-icon-button>
+              <paper-button on-tap="saveBuilding">Save</paper-button>
               <paper-menu on-iron-select="selectFloor" selected="{{floorIndex}}">
                 <template is="dom-repeat" items="{{selected.floors}}">
                   <paper-item>{{item.floor}}</paper-item>
                 </template>
               </paper-menu>
+              <template is="dom-if" if="[[room]]">
+                <div class="room">
+                  <h2>Room Properties</h2>
+                  <paper-input label="Id" value="{{room.id}}"></paper-input>
+                  <paper-input label="Name" value="{{room.name}}"></paper-input>
+                  <label>Room Type</label>
+                  <select on-change="setRoomType" value="[[room.type]]">
+                    <option value="">default</option>
+                    <option value="printer">printer</option>
+                    <option value="restroom">restroom</option>
+                    <option value="food">food</option>
+                    <option value="bookable">bookable</option>
+                  </select>
+                  <paper-button on-tap="deleteRoom">delete</paper-button>
+                </div>
+              </template>
             </div>
             <div main id="floor">
-              <paper-input label="Floor Name" value="{{floor.floor}}"></paper-input>
-              <paper-input label="Image URL" value="{{floor.image}}"></paper-input>
-              <div id="map">
-                <img src="[[floor.image]]">
-                <template is="dom-repeat" items="{{floor.rooms}}">
-                  <div class="marker" style$="[[markerPos(floor, item)]]"></div>
-                </template>
-              </div>
+              <template is="dom-if" if="[[floor.floor]]">
+                <paper-button on-tap="deleteFloor">delete</paper-button>
+                <paper-button on-tap="ocrFloor">OCR</paper-button>
+                <paper-input label="Floor Name" value="{{floor.floor}}"></paper-input>
+                <paper-input label="Image URL" value="{{floor.image}}"></paper-input>
+                <div id="map">
+                  <img on-tap="insertMarker" src="[[floor.image]]">
+                  <template is="dom-repeat" items="{{floor.rooms}}">
+                    <div class="marker" on-tap="markerDetails" style$="[[markerPos(floor, item)]]"></div>
+                  </template>
+                </div>
+              </template>
             </div>
           </paper-drawer-panel>
         </div>
@@ -77,9 +103,24 @@
     </paper-drawer-panel>
     <iron-ajax
          auto
-         url="/dump/"
+         url="/api/dump/"
          handle-as="json"
          last-response="{{buildings}}"
+         debounce-duration="300"></iron-ajax>
+    <iron-ajax id="save"
+         url="/api/save_building/"
+         handle-as="json"
+         body="{{selected}}"
+         content-type="application/json"
+         method="POST"
+         debounce-duration="300"></iron-ajax>
+    <iron-ajax id="ocr"
+         url="/api/ocr/"
+         handle-as="json"
+         body="{{floor}}"
+         content-type="application/json"
+         method="POST"
+         on-response="ocrResp"
          debounce-duration="300"></iron-ajax>
   </template>
 
@@ -91,12 +132,24 @@ Polymer({
       type: Array,
       value: null,
     },
+    floor: {
+      type: Object,
+      value: null,
+    },
+    selected: {
+      type: Object,
+      value: null,
+    },
   },
   select: function(e) {
     this.selected = this.buildings[this.selectedIndex];
+    this.floor = {coords:{}, image:''};
+    this.floorIndex = -1;
+    this.room = null;
   },
   selectFloor: function(e) {
     this.floor = this.selected.floors[this.floorIndex];
+    this.room = null;
   },
   newFloor: function() {
     if (!this.selected) {
@@ -107,6 +160,7 @@ Polymer({
       floor: 'Unnamed',
       image: '',
       rooms: [],
+      rotation: 0,
       coords: {
         north: pos.H + 0.001,
         south: pos.H - 0.001,
@@ -119,10 +173,80 @@ Polymer({
     } else {
       this.push('selected.floors', floor);
     }
+    this.saveBuilding();
   },
-  markerPos: function(item) {
-    return 'left: 10px; top: 10px;';
-  }
+  saveBuilding: function() {
+    this.$.save.generateRequest();
+  },
+  deleteFloor: function(e) {
+    if(!confirm('You want to delete yeah?')) {
+      return;
+    }
+    var index = this.selected.floors.indexOf(e.model.floor);
+    if (index > -1) {
+      this.splice('selected.floors', index, 1);
+    }
+    this.floor = null;
+    this.saveBuilding();
+  },
+  deleteRoom: function(e) {
+    if(!confirm('You want to delete yeah?')) {
+      return;
+    }
+    var index = this.floor.rooms.indexOf(this.room);
+    if (index > -1) {
+      this.splice('floor.rooms', index, 1);
+    }
+    this.room = null;
+    this.saveBuilding();
+  },
+  ocrFloor: function(e) {
+    this.$.ocr.generateRequest();
+  },
+  ocrResponse: function(a,b,c) {
+    debugger;
+  },
+  markerPos: function(floor, item) {
+    var top = (floor.coords.north - item.position.H)/(floor.coords.north - floor.coords.south)*100;
+    var left = (1-(floor.coords.east - item.position.L)/(floor.coords.east - floor.coords.west))*100;
+    return 'left: '+left.toFixed(1)+'%; top: '+top.toFixed(1)+'%;';
+  },
+  markerDetails: function(e) {
+    this.room = e.model.item;
+  },
+  setRoomType: function(e) {
+    this.room.type = e.target.value;
+  },
+  insertMarker: function(e) {
+    var bounding = e.target.getBoundingClientRect();
+    var x = e.detail.x - bounding.left;
+    var y = e.detail.y - bounding.top;
+    var px = x/(bounding.right - bounding.left);
+    var py = y/(bounding.bottom - bounding.top);
+    var lat = (1-py)*(this.floor.coords.north - this.floor.coords.south) + this.floor.coords.south;
+    var lng = px*(this.floor.coords.east - this.floor.coords.west) + this.floor.coords.west;
+    var id = prompt("enter room number");
+    if (!id) {
+      console.log('must have a room id');
+      return;
+    }
+    var room = {
+      id: id,
+      sis: this.selected.sis,
+      name: '',
+      type: '',
+      floor: this.floor.floor,
+      position: {
+        H: lat,
+        L: lng,
+      },
+    };
+    if (!this.floor.rooms) {
+      this.set('floor.rooms', [room]);
+    } else {
+      this.push('floor.rooms', room);
+    }
+  },
 });
   </script>
 </dom-module>

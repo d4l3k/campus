@@ -20,7 +20,7 @@ func LoadMapData() ([]*Building, error) {
 }
 
 func SaveMapData(buildings []*Building) error {
-	buf, err := json.Marshal(buildings)
+	buf, err := json.MarshalIndent(buildings, "", "  ")
 	if err != nil {
 		return err
 	}

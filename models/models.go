@@ -28,14 +28,15 @@ func (b Building) Meta() *Building {
 }
 
 type Floor struct {
-	Name   string  `json:"floor"`
-	Coords *Coords `json:"coords"`
-	Image  string  `json:"image"`
-	Rooms  []*Room `json:"rooms"`
+	Name     string  `json:"floor"`
+	Coords   *Coords `json:"coords"`
+	Image    string  `json:"image"`
+	Rooms    []*Room `json:"rooms"`
+	Rotation float32 `json:"rotation"`
 
-	NativeImage image.Image
-	ImageWG     sync.WaitGroup
-	ImageOnce   sync.Once
+	NativeImage image.Image    `json:"-"`
+	ImageWG     sync.WaitGroup `json:"-"`
+	ImageOnce   sync.Once      `json:"-"`
 }
 
 func (f *Floor) LoadImage() (image.Image, error) {

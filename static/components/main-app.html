@@ -110,7 +110,7 @@ Polymer({
     });
     var imageMapType = new google.maps.ImageMapType({
       getTileUrl: function(coord, zoom) {
-        return ['/tiles/', zoom, '_', coord.x, '_', coord.y, '_', self.floor, '.png'].join('');
+        return ['/api/tiles/', zoom, '_', coord.x, '_', coord.y, '_', self.floor, '.png'].join('');
       },
       tileSize: new google.maps.Size(256, 256)
     });
@@ -136,7 +136,7 @@ Polymer({
       zoom: this.map.getZoom(),
       floor: floor,
     };
-    return '/view/'+JSON.stringify(point);
+    return '/api/view/'+JSON.stringify(point);
   },
   clearMarkers: function() {
     this.markers.forEach(function(marker) {
@@ -219,7 +219,7 @@ Polymer({
     if (!selected) {
       return;
     }
-    return '/item/'+selected;
+    return '/api/item/'+selected;
   },
 });
   </script>
