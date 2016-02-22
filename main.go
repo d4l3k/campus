@@ -22,6 +22,8 @@ import (
 	"github.com/d4l3k/campus/models"
 	"github.com/golang/groupcache"
 	"github.com/gorilla/mux"
+
+	_ "net/http/pprof"
 )
 
 var (

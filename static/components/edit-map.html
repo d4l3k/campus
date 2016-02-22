@@ -37,6 +37,14 @@
     .room {
       padding: 10px;
     }
+    paper-item label {
+      opacity: 0.5;
+      font: monospace;
+      position: absolute;
+      right: 16px;
+      height: 48px;
+      line-height: 48px;
+    }
     </style>
     <paper-drawer-panel>
       <paper-header-panel drawer>
@@ -46,7 +54,10 @@
         <div>
           <paper-menu on-iron-select="select" selected="{{selectedIndex}}">
             <template is="dom-repeat" items="{{buildings}}">
-              <paper-item>{{item.sis}}</paper-item>
+              <paper-item>
+                <span>[[item.sis]]</span>
+                <label>[[len(item.floors)]]</label>
+              </paper-item>
             </template>
           </paper-menu>
         </div>
@@ -89,6 +100,8 @@
                 <paper-button on-tap="ocrFloor">OCR</paper-button>
                 <paper-input label="Floor Name" value="{{floor.floor}}"></paper-input>
                 <paper-input label="Image URL" value="{{floor.image}}"></paper-input>
+                <paper-input type="number" label="Rotation (Radians)" value="[[floor.rotation]]" on-change="floorRotation"></paper-input>
+                <paper-input label="Coordinates (JSON)" value="[[stringify(floor.coords)]]" on-change="floorCoords"></paper-input>
                 <div id="map">
                   <img on-tap="insertMarker" src="[[floor.image]]">
                   <template is="dom-repeat" items="{{floor.rooms}}">
@@ -141,6 +154,11 @@ Polymer({
       value: null,
     },
   },
+  len: function(a) {
+    if (a && a.length > 0) {
+      return a.length;
+    }
+  },
   select: function(e) {
     this.selected = this.buildings[this.selectedIndex];
     this.floor = {coords:{}, image:''};
@@ -162,8 +180,8 @@ Polymer({
       rooms: [],
       rotation: 0,
       coords: {
-        north: pos.H + 0.001,
-        south: pos.H - 0.001,
+        north: pos.H + 0.001/2,
+        south: pos.H - 0.001/2,
         east: pos.L + 0.001,
         west: pos.L - 0.001,
       }
@@ -174,6 +192,13 @@ Polymer({
       this.push('selected.floors', floor);
     }
     this.saveBuilding();
+  },
+  floorRotation: function(e) {
+    this.set('floor.rotation', parseFloat(e.target.value));
+  },
+  floorCoords: function(e) {
+    this.set('floor.coords', JSON.parse(e.target.value));
+    this.recomputeRoomPositions(this.floor.rooms);
   },
   saveBuilding: function() {
     this.$.save.generateRequest();
@@ -207,9 +232,15 @@ Polymer({
     debugger;
   },
   markerPos: function(floor, item) {
-    var top = (floor.coords.north - item.position.H)/(floor.coords.north - floor.coords.south)*100;
-    var left = (1-(floor.coords.east - item.position.L)/(floor.coords.east - floor.coords.west))*100;
-    return 'left: '+left.toFixed(1)+'%; top: '+top.toFixed(1)+'%;';
+    var top, left;
+    if (item.rel_position) {
+      top = item.rel_position.H;
+      left = item.rel_position.L;
+    } else {
+      top = (floor.coords.north - item.position.H)/(floor.coords.north - floor.coords.south);
+      left = (1-(floor.coords.east - item.position.L)/(floor.coords.east - floor.coords.west));
+    }
+    return 'left: '+(left*100).toFixed(1)+'%; top: '+(top*100).toFixed(1)+'%;';
   },
   markerDetails: function(e) {
     this.room = e.model.item;
@@ -217,14 +248,15 @@ Polymer({
   setRoomType: function(e) {
     this.room.type = e.target.value;
   },
+  stringify: function(a) {
+    return JSON.stringify(a);
+  },
   insertMarker: function(e) {
     var bounding = e.target.getBoundingClientRect();
     var x = e.detail.x - bounding.left;
     var y = e.detail.y - bounding.top;
     var px = x/(bounding.right - bounding.left);
     var py = y/(bounding.bottom - bounding.top);
-    var lat = (1-py)*(this.floor.coords.north - this.floor.coords.south) + this.floor.coords.south;
-    var lng = px*(this.floor.coords.east - this.floor.coords.west) + this.floor.coords.west;
     var id = prompt("enter room number");
     if (!id) {
       console.log('must have a room id');
@@ -236,9 +268,9 @@ Polymer({
       name: '',
       type: '',
       floor: this.floor.floor,
-      position: {
-        H: lat,
-        L: lng,
+      rel_position: {
+        H: py,
+        L: px,
       },
     };
     if (!this.floor.rooms) {
@@ -247,6 +279,25 @@ Polymer({
       this.push('floor.rooms', room);
     }
     this.room = room;
+  },
+  recomputeRoomPositions: function(rooms) {
+    var self = this;
+    rooms.forEach(function(room) {
+      self.computeRoomPosition(room);
+    });
+  },
+  computeRoomPosition: function(room) {
+    if (!room.rel_position) {
+      return;
+    }
+    var px = room.rel_position.L;
+    var py = room.rel_position.H;
+    var lat = (1-py)*(this.floor.coords.north - this.floor.coords.south) + this.floor.coords.south;
+    var lng = px*(this.floor.coords.east - this.floor.coords.west) + this.floor.coords.west;
+    room.position = {
+      H: lat,
+      L: lng,
+    };
   },
 });
   </script>

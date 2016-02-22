@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"io/ioutil"
+	"sort"
 )
 
 var MapDataPath = "./static/maps/map.json"
@@ -16,6 +17,7 @@ func LoadMapData() ([]*Building, error) {
 	if err := json.Unmarshal(buf, &buildings); err != nil {
 		return nil, err
 	}
+	sort.Sort(BySIS(buildings))
 	return buildings, nil
 }
 
@@ -26,3 +28,9 @@ func SaveMapData(buildings []*Building) error {
 	}
 	return ioutil.WriteFile(MapDataPath, buf, 0755)
 }
+
+type BySIS []*Building
+
+func (a BySIS) Len() int           { return len(a) }
+func (a BySIS) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a BySIS) Less(i, j int) bool { return a[i].SIS < a[j].SIS }

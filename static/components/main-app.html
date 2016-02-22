@@ -121,6 +121,29 @@ Polymer({
     });
     self.floor = '1';
   },
+  coords: function() {
+    this.map.overlayMapTypes.clear();
+    this.refreshTiles();
+    var i = 0;
+    var lats = [];
+    var lngs = [];
+    this.map.addListener('click', function(e) {
+      if (i >= 4) {
+        return;
+      }
+      lats.push(e.latLng.lat());
+      lngs.push(e.latLng.lng());
+      i++;
+      if (i >= 4) {
+        console.log(JSON.stringify({
+          north: Math.max.apply(0, lats),
+          south: Math.min.apply(0, lats),
+          east: Math.max.apply(0, lngs),
+          west: Math.min.apply(0, lngs),
+        }));
+      }
+    });
+  },
   refreshTiles: function() {
     var zoom = this.map.getZoom();
     this.map.setZoom(zoom+1);

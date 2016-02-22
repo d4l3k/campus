@@ -1,17 +1,19 @@
 package models
 
 import (
+	"fmt"
 	"image"
+	"image/draw"
 	"log"
 	"os"
 	"sync"
 )
 
 type Building struct {
-	Floors      []*Floor `json:"floors"`
-	Name        string   `json:"name"`
-	SIS         string   `json:"sis"`
-	Position    *LatLng  `json:"position"`
+	Floors      []*Floor `json:"floors,omitempty"`
+	Name        string   `json:"name,omitempty"`
+	SIS         string   `json:"sis,omitempty"`
+	Position    *LatLng  `json:"position,omitempty"`
 	Address     string
 	Image       string
 	Description string
@@ -28,55 +30,47 @@ func (b Building) Meta() *Building {
 }
 
 type Floor struct {
-	Name     string  `json:"floor"`
-	Coords   *Coords `json:"coords"`
-	Image    string  `json:"image"`
-	Rooms    []*Room `json:"rooms"`
-	Rotation float32 `json:"rotation"`
+	Name     string  `json:"floor,omitempty"`
+	Coords   *Coords `json:"coords,omitempty"`
+	Image    string  `json:"image,omitempty"`
+	Rooms    []*Room `json:"rooms,omitempty"`
+	Rotation float64 `json:"rotation,omitempty"`
 
-	NativeImage image.Image    `json:"-"`
-	ImageWG     sync.WaitGroup `json:"-"`
-	ImageOnce   sync.Once      `json:"-"`
+	RotatedImage draw.Image     `json:"-"`
+	ImageWG      sync.WaitGroup `json:"-"`
+	ImageOnce    sync.Once      `json:"-"`
 }
 
-func (f *Floor) LoadImage() (image.Image, error) {
-	var err error
-	var img image.Image
-	f.ImageOnce.Do(func() {
-		f.ImageWG.Add(1)
-		defer f.ImageWG.Done()
-		log.Printf("Loading image: %s", f.Image)
-		fImg, err2 := os.Open("static/" + f.Image)
-		if err2 != nil {
-			err = err2
-			return
-		}
-		defer fImg.Close()
-		img, _, err = image.Decode(fImg)
-		if err != nil {
-			return
-		}
-		f.NativeImage = img
-	})
-	f.ImageWG.Wait()
-	if f.NativeImage != nil {
-		return f.NativeImage, nil
+func (f *Floor) LoadImage() (draw.Image, error) {
+	log.Printf("Loading image: %s", f.Image)
+	fImg, err := os.Open("static/" + f.Image)
+	if err != nil {
+		return nil, err
 	}
-	return img, err
+	defer fImg.Close()
+	img, _, err := image.Decode(fImg)
+	if err != nil {
+		return nil, err
+	}
+	image, err := imageToDraw(img)
+	if err != nil {
+		return nil, err
+	}
+	return image, nil
 }
 
 type Coords struct {
-	North float64 `json:"north"`
-	South float64 `json:"south"`
-	East  float64 `json:"east"`
-	West  float64 `json:"west"`
+	North float64 `json:"north,omitempty"`
+	South float64 `json:"south,omitempty"`
+	East  float64 `json:"east,omitempty"`
+	West  float64 `json:"west,omitempty"`
 }
 
 type ZoomableCoord struct {
 	*Coords
 
-	Zoom  int    `json:"zoom"`
-	Floor string `json:"floor"`
+	Zoom  int    `json:"zoom,omitempty"`
+	Floor string `json:"floor,omitempty"`
 }
 
 func (c Coords) Overlap(c2 *Coords) bool {
@@ -88,17 +82,18 @@ func (c Coords) OverlapLatLng(p *LatLng) bool {
 }
 
 type Room struct {
-	Id       string  `json:"id"`
-	SIS      string  `json:"sis"`
-	Name     string  `json:"name"`
-	Position *LatLng `json:"position"`
-	Type     string  `json:"type"`
-	Floor    string  `json:"floor"`
+	Id          string  `json:"id,omitempty"`
+	SIS         string  `json:"sis,omitempty"`
+	Name        string  `json:"name,omitempty"`
+	Position    *LatLng `json:"position,omitempty"`
+	RelPosition *LatLng `json:"rel_position,omitempty"`
+	Type        string  `json:"type,omitempty"`
+	Floor       string  `json:"floor,omitempty"`
 }
 
 type LatLng struct {
-	Lat float64 `json:"H"`
-	Lng float64 `json:"L"`
+	Lat float64 `json:"H,omitempty"`
+	Lng float64 `json:"L,omitempty"`
 }
 
 type Index struct {
@@ -109,4 +104,31 @@ type Index struct {
 	Description string
 
 	Item interface{} `json:"-"`
+}
+
+func imageToDraw(i image.Image) (draw.Image, error) {
+	switch i := i.(type) {
+	case *image.Alpha:
+		return draw.Image(i), nil
+	case *image.Alpha16:
+		return draw.Image(i), nil
+	case *image.CMYK:
+		return draw.Image(i), nil
+	case *image.Gray:
+		return draw.Image(i), nil
+	case *image.Gray16:
+		return draw.Image(i), nil
+	case *image.NRGBA:
+		return draw.Image(i), nil
+	case *image.NRGBA64:
+		return draw.Image(i), nil
+	case *image.Paletted:
+		return draw.Image(i), nil
+	case *image.RGBA:
+		return draw.Image(i), nil
+	case *image.RGBA64:
+		return draw.Image(i), nil
+	default:
+		return nil, fmt.Errorf("invalid image type %T", i)
+	}
 }

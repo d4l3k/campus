@@ -7,9 +7,11 @@ import (
 	"image/draw"
 	"image/png"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 
+	"github.com/BurntSushi/graphics-go/graphics"
 	"github.com/d4l3k/campus/models"
 	"github.com/golang/groupcache"
 	"github.com/gorilla/mux"
@@ -18,8 +20,42 @@ import (
 
 const TileWorkers = 4
 
+var tileEncoder = &png.Encoder{CompressionLevel: png.NoCompression}
+var blankTile []byte
+
+func init() {
+	img := image.NewNRGBA(image.Rect(0, 0, TileSize, TileSize))
+
+	var buf bytes.Buffer
+	if err := (&png.Encoder{CompressionLevel: png.BestCompression}).Encode(&buf, img); err != nil {
+		log.Fatal(err)
+	}
+	blankTile = buf.Bytes()
+}
+
 type zoomedImageGetter struct {
 	s *Server
+}
+
+func newDimentions(img draw.Image, angle float64) (int, int) {
+	affine := graphics.I.Rotate(angle)
+	bounds := img.Bounds()
+	width := float64(bounds.Max.X - bounds.Min.X)
+	height := float64(bounds.Max.Y - bounds.Min.Y)
+
+	rotated := affine.Mul(graphics.Affine{
+		width, width, 0,
+		height, 0, height,
+		1, 1, 1})
+	log.Printf("Rotation matrix %+v", rotated)
+
+	// Compute new bounding coordinates
+	left := math.Min(math.Min(0, rotated[0]), math.Min(rotated[1], rotated[2]))
+	right := math.Max(math.Max(0, rotated[0]), math.Max(rotated[1], rotated[2]))
+	bottom := math.Min(math.Min(0, rotated[3]), math.Min(rotated[4], rotated[5]))
+	top := math.Max(math.Max(0, rotated[3]), math.Max(rotated[4], rotated[5]))
+
+	return int(math.Abs(right - left)), int(math.Abs(top - bottom))
 }
 
 func (g zoomedImageGetter) Get(ctx groupcache.Context, key string, dest groupcache.Sink) error {
@@ -29,10 +65,34 @@ func (g zoomedImageGetter) Get(ctx groupcache.Context, key string, dest groupcac
 	}
 
 	floor := g.s.GetBuildingFloor(bfz.Building, bfz.Floor)
-	img, err := floor.LoadImage()
+	var err error
+	floor.ImageOnce.Do(func() {
+		var img, origImg draw.Image
+		floor.ImageWG.Add(1)
+		defer floor.ImageWG.Done()
+		origImg, err = floor.LoadImage()
+		if err != nil {
+			return
+		}
+
+		img = origImg
+
+		if floor.Rotation != 0 {
+			rotatedWidth, rotatedHeight := newDimentions(origImg, floor.Rotation)
+			img = image.NewNRGBA64(image.Rect(0, 0, rotatedWidth, rotatedHeight))
+			if err = graphics.Rotate(img, origImg, &graphics.RotateOptions{Angle: floor.Rotation}); err != nil {
+				return
+			}
+		}
+		floor.RotatedImage = img
+	})
+	floor.ImageWG.Wait()
 	if err != nil {
 		return err
 	}
+
+	img := floor.RotatedImage
+
 	coords := ctx.(*models.Coords)
 	latDiff := coords.North - coords.South
 	lngDiff := coords.East - coords.West
@@ -45,7 +105,7 @@ func (g zoomedImageGetter) Get(ctx groupcache.Context, key string, dest groupcac
 
 	resizedImg := resize.Resize(uint(newWidth), uint(newHeight), img, resize.NearestNeighbor)
 	var buf bytes.Buffer
-	if err := png.Encode(&buf, resizedImg); err != nil {
+	if err := tileEncoder.Encode(&buf, resizedImg); err != nil {
 		return err
 	}
 	return dest.SetBytes(buf.Bytes())
@@ -72,8 +132,11 @@ func (g mapTileGetter) Get(ctx groupcache.Context, key string, dest groupcache.S
 	}
 	buildings := g.s.OverlappingBuildings(coords)
 
-	m := image.NewNRGBA(image.Rect(0, 0, TileSize, TileSize))
+	if len(buildings) == 0 {
+		return dest.SetBytes(blankTile)
+	}
 
+	m := image.NewNRGBA(image.Rect(0, 0, TileSize, TileSize))
 	for _, building := range buildings {
 		for _, floor := range building.Floors {
 			if floor.Name != req.Floor {
