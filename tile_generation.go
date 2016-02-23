@@ -37,16 +37,22 @@ type zoomedImageGetter struct {
 	s *Server
 }
 
-func newDimentions(img draw.Image, angle float64) (int, int) {
-	affine := graphics.I.Rotate(angle)
+func newImageDimentions(img draw.Image, angle float64) (int, int) {
 	bounds := img.Bounds()
 	width := float64(bounds.Max.X - bounds.Min.X)
 	height := float64(bounds.Max.Y - bounds.Min.Y)
 
+	w, h := newDimentions(width, height, angle)
+	return int(w), int(h)
+}
+
+func newDimentions(width, height, angle float64) (float64, float64) {
+	affine := graphics.I.Rotate(angle)
 	rotated := affine.Mul(graphics.Affine{
 		width, width, 0,
 		height, 0, height,
-		1, 1, 1})
+		1, 1, 1,
+	})
 	log.Printf("Rotation matrix %+v", rotated)
 
 	// Compute new bounding coordinates
@@ -55,7 +61,7 @@ func newDimentions(img draw.Image, angle float64) (int, int) {
 	bottom := math.Min(math.Min(0, rotated[3]), math.Min(rotated[4], rotated[5]))
 	top := math.Max(math.Max(0, rotated[3]), math.Max(rotated[4], rotated[5]))
 
-	return int(math.Abs(right - left)), int(math.Abs(top - bottom))
+	return (math.Abs(right - left)), (math.Abs(top - bottom))
 }
 
 func (g zoomedImageGetter) Get(ctx groupcache.Context, key string, dest groupcache.Sink) error {
@@ -78,7 +84,7 @@ func (g zoomedImageGetter) Get(ctx groupcache.Context, key string, dest groupcac
 		img = origImg
 
 		if floor.Rotation != 0 {
-			rotatedWidth, rotatedHeight := newDimentions(origImg, floor.Rotation)
+			rotatedWidth, rotatedHeight := newImageDimentions(origImg, floor.Rotation)
 			img = image.NewNRGBA64(image.Rect(0, 0, rotatedWidth, rotatedHeight))
 			if err = graphics.Rotate(img, origImg, &graphics.RotateOptions{Angle: floor.Rotation}); err != nil {
 				return

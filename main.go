@@ -15,6 +15,7 @@ import (
 	"google.golang.org/api/googleapi/transport"
 	"google.golang.org/api/vision/v1"
 
+	"github.com/BurntSushi/graphics-go/graphics"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/abbot/go-http-auth"
 	"github.com/blevesearch/bleve"
@@ -195,6 +196,33 @@ func (s *Server) saveBuilding(w http.ResponseWriter, r *auth.AuthenticatedReques
 	for i, b2 := range s.buildings {
 		if b2.SIS != b.SIS {
 			continue
+		}
+		for _, f := range b.Floors {
+			dx, dy := newDimentions(1, 1, -f.Rotation)
+			_ = dx
+			_ = dy
+			affine := graphics.I.Rotate(-f.Rotation)
+			for _, r := range f.Rooms {
+				if r.RelPosition == nil {
+					continue
+				}
+				rotated := affine.Mul(graphics.Affine{
+					(r.RelPosition.Lng - 0.5), 0, 0,
+					(r.RelPosition.Lat - 0.5), 0, 0,
+					1, 1, 1,
+				})
+				px := rotated[0] / dx
+				py := rotated[3] / dy
+
+				log.Printf("PX %f PY %f", px, py)
+
+				lat := (-py+0.5)*f.Coords.DLat() + f.Coords.South
+				lng := (px+0.5)*f.Coords.DLng() + f.Coords.West
+				r.Position = &models.LatLng{
+					Lat: lat,
+					Lng: lng,
+				}
+			}
 		}
 		s.buildings[i] = b
 		if err := models.SaveMapData(s.buildings); err != nil {

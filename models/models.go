@@ -81,6 +81,13 @@ func (c Coords) OverlapLatLng(p *LatLng) bool {
 	return c.West < p.Lng && c.East > p.Lng && c.North > p.Lat && c.South < p.Lat
 }
 
+func (c Coords) DLat() float64 {
+	return c.North - c.South
+}
+func (c Coords) DLng() float64 {
+	return c.East - c.West
+}
+
 type Room struct {
 	Id          string  `json:"id,omitempty"`
 	SIS         string  `json:"sis,omitempty"`

@@ -198,7 +198,6 @@ Polymer({
   },
   floorCoords: function(e) {
     this.set('floor.coords', JSON.parse(e.target.value));
-    this.recomputeRoomPositions(this.floor.rooms);
   },
   saveBuilding: function() {
     this.$.save.generateRequest();
@@ -280,12 +279,7 @@ Polymer({
     }
     this.room = room;
   },
-  recomputeRoomPositions: function(rooms) {
-    var self = this;
-    rooms.forEach(function(room) {
-      self.computeRoomPosition(room);
-    });
-  },
+  /*
   computeRoomPosition: function(room) {
     if (!room.rel_position) {
       return;
@@ -299,6 +293,7 @@ Polymer({
       L: lng,
     };
   },
+  */
 });
   </script>
 </dom-module>
