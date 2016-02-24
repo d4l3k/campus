@@ -1,0 +1,13 @@
+[Unit]
+Description=campus - a map for UBC
+
+[Service]
+Type=simple
+User=campus
+Group=campus
+WorkingDirectory=/srv/campus
+ExecStart=/srv/campus/campus
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
