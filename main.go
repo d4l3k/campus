@@ -33,6 +33,7 @@ var (
 	googleClientID     = flag.String("clientID", "", "the Google Vision API client id")
 	googleClientSecret = flag.String("clientSecret", "", "the Google Vision API client secret")
 	cacheToken         = flag.Bool("cachetoken", true, "cache the OAuth 2.0 token")
+	addr               = flag.String("addr", ":8383", "the address to listen on")
 )
 
 const TileSize = 256
@@ -142,8 +143,8 @@ func (s *Server) indexBuildings() {
 }
 
 func (s *Server) Listen() error {
-	log.Println("Listening on :8383...")
-	return http.ListenAndServe(":8383", nil)
+	log.Printf("Listening on %s...", *addr)
+	return http.ListenAndServe(*addr, nil)
 }
 
 // GetBuildingFloor returns the specified floor from building and floor name.
