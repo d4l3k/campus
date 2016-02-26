@@ -3,12 +3,15 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"image"
 	"image/draw"
 	"image/png"
+	"io/ioutil"
 	"log"
 	"math"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/BurntSushi/graphics-go/graphics"
@@ -115,16 +118,15 @@ func (g zoomedImageGetter) Get(ctx groupcache.Context, key string, dest groupcac
 	return dest.SetBytes(buf.Bytes())
 }
 
-type mapTileGetter struct {
-	s *Server
-}
-
-func (g mapTileGetter) Get(ctx groupcache.Context, key string, dest groupcache.Sink) error {
-	req := &MapTileRequest{}
-	if err := json.Unmarshal([]byte(key), req); err != nil {
-		return err
+func (s *Server) generateTile(req *MapTileRequest) ([]byte, error) {
+	url := fmt.Sprintf("static/api/tiles/%d_%d_%d_%s.png", req.Z, req.X, req.Y, req.Floor)
+	if _, err := os.Stat(url); err == nil {
+		if *debug {
+			log.Printf("file exists, but not serving due to debug; %s", url)
+		} else {
+			return ioutil.ReadFile(url)
+		}
 	}
-
 	point := tileToPoint(req.X, req.Y, req.Z)
 	pointBottom := tileToPoint(req.X+1, req.Y+1, req.Z)
 	log.Printf("Map tile req %+v %+v %+v", req, point, pointBottom)
@@ -134,10 +136,10 @@ func (g mapTileGetter) Get(ctx groupcache.Context, key string, dest groupcache.S
 		West:  point.Lng(),
 		East:  pointBottom.Lng(),
 	}
-	buildings := g.s.OverlappingBuildings(coords)
+	buildings := s.OverlappingBuildings(coords)
 
 	if len(buildings) == 0 {
-		return dest.SetBytes(blankTile)
+		return blankTile, nil
 	}
 
 	m := image.NewNRGBA(image.Rect(0, 0, TileSize, TileSize))
@@ -149,15 +151,15 @@ func (g mapTileGetter) Get(ctx groupcache.Context, key string, dest groupcache.S
 			bfz := &BuildingFloorZoom{building.Name, floor.Name, req.Z}
 			buf, err := json.Marshal(bfz)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			var resp []byte
-			if err := g.s.zoomedFloorCache.Get(coords, string(buf), groupcache.AllocatingByteSliceSink(&resp)); err != nil {
-				return err
+			if err := s.zoomedFloorCache.Get(coords, string(buf), groupcache.AllocatingByteSliceSink(&resp)); err != nil {
+				return nil, err
 			}
 			resizedImg, _, err := image.Decode(bytes.NewBuffer(resp))
 			if err != nil {
-				return err
+				return nil, err
 			}
 			rect := resizedImg.Bounds()
 			x := float64(rect.Dx()) - float64(rect.Dx())/(floor.Coords.East-floor.Coords.West)*(floor.Coords.East-coords.East) - TileSize
@@ -169,9 +171,13 @@ func (g mapTileGetter) Get(ctx groupcache.Context, key string, dest groupcache.S
 
 	var buf bytes.Buffer
 	if err := png.Encode(&buf, m); err != nil {
-		return err
+		return nil, err
 	}
-	return dest.SetBytes(buf.Bytes())
+	bytes := buf.Bytes()
+	if err := ioutil.WriteFile(url, bytes, 0755); err != nil {
+		return nil, err
+	}
+	return bytes, nil
 }
 
 type BuildingFloorZoom struct {
@@ -196,14 +202,8 @@ func (s *Server) initTileBuilding() {
 
 func (s *Server) tileWorker() {
 	for req := range s.mapTileReq {
-		buf, err := json.Marshal(req)
+		resp, err := s.generateTile(req)
 		if err != nil {
-			req.err <- err
-			continue
-		}
-
-		var resp []byte
-		if err := s.tileCache.Get(nil, string(buf), groupcache.AllocatingByteSliceSink(&resp)); err != nil {
 			req.err <- err
 			continue
 		}

@@ -12,9 +12,4 @@ func (s *Server) initCache() {
 		s.zoomedFloorCache = groupcache.NewGroup("zoomedImages", int64(256*units.MiB), g)
 	}
 
-	s.tileCache = groupcache.GetGroup("mapTiles")
-	if s.tileCache == nil {
-		g := mapTileGetter{s}
-		s.tileCache = groupcache.NewGroup("mapTiles", int64(256*units.MiB), g)
-	}
 }

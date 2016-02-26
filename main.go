@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
@@ -22,6 +23,7 @@ import (
 	"github.com/blevesearch/bleve/search"
 	"github.com/d4l3k/campus/models"
 	"github.com/golang/groupcache"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
 	_ "net/http/pprof"
@@ -34,6 +36,7 @@ var (
 	googleClientSecret = flag.String("clientSecret", "", "the Google Vision API client secret")
 	cacheToken         = flag.Bool("cachetoken", true, "cache the OAuth 2.0 token")
 	addr               = flag.String("addr", ":8383", "the address to listen on")
+	debug              = flag.Bool("debug", false, "whether to run in debug mode")
 )
 
 const TileSize = 256
@@ -42,7 +45,6 @@ type Server struct {
 	r                *mux.Router
 	buildings        []*models.Building
 	zoomedFloorCache *groupcache.Group
-	tileCache        *groupcache.Group
 	index            bleve.Index
 	idIndex          map[string]*models.Index
 	authenticator    auth.AuthenticatorInterface
@@ -144,7 +146,7 @@ func (s *Server) indexBuildings() {
 
 func (s *Server) Listen() error {
 	log.Printf("Listening on %s...", *addr)
-	return http.ListenAndServe(*addr, nil)
+	return http.ListenAndServe(*addr, handlers.LoggingHandler(os.Stdout, http.DefaultServeMux))
 }
 
 // GetBuildingFloor returns the specified floor from building and floor name.

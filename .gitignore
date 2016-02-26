@@ -26,3 +26,4 @@ _testmain.go
 static/bower_components
 campus
 static/index.html
+static/api/tiles/*.png
