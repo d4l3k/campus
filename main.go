@@ -199,26 +199,25 @@ func (s *Server) saveBuilding(w http.ResponseWriter, r *auth.AuthenticatedReques
 			continue
 		}
 		for _, f := range b.Floors {
-			dx, dy := newDimentions(1, 1, -f.Rotation)
-			_ = dx
-			_ = dy
-			affine := graphics.I.Rotate(-f.Rotation)
+			dx, dy := newDimentions(f.Coords.DLng(), f.Coords.DLat(), f.Rotation)
+			affine := graphics.I.Rotate(f.Rotation)
+			log.Printf("DX %f DY %f", dx, dy)
 			for _, r := range f.Rooms {
 				if r.RelPosition == nil {
 					continue
 				}
 				rotated := affine.Mul(graphics.Affine{
-					(r.RelPosition.Lng - 0.5), 0, 0,
-					(r.RelPosition.Lat - 0.5), 0, 0,
+					(r.RelPosition.Lng - 0.5) * f.Coords.DLng(), 0, 0,
+					(1 - r.RelPosition.Lat - 0.5) * f.Coords.DLat(), 0, 0,
 					1, 1, 1,
 				})
-				px := rotated[0] / dx
-				py := rotated[3] / dy
+				px := (rotated[0]/dx + 0.5)
+				py := (rotated[3]/dy + 0.5)
 
-				log.Printf("PX %f PY %f", px, py)
+				log.Printf("(%f, %f) -> (%f, %f)", r.RelPosition.Lng, r.RelPosition.Lat, px, py)
 
-				lat := (-py+0.5)*f.Coords.DLat() + f.Coords.South
-				lng := (px+0.5)*f.Coords.DLng() + f.Coords.West
+				lat := (py)*f.Coords.DLat() + f.Coords.South
+				lng := (px)*f.Coords.DLng() + f.Coords.West
 				r.Position = &models.LatLng{
 					Lat: lat,
 					Lng: lng,

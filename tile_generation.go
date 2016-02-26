@@ -100,12 +100,10 @@ func (g zoomedImageGetter) Get(ctx groupcache.Context, key string, dest groupcac
 	img := floor.RotatedImage
 
 	coords := ctx.(*models.Coords)
-	latDiff := coords.North - coords.South
-	lngDiff := coords.East - coords.West
-	pixelsPerLongitude := TileSize / (lngDiff)
-	pixelsPerLatitude := TileSize / (latDiff)
-	newWidth := (floor.Coords.East - floor.Coords.West) * pixelsPerLongitude
-	newHeight := (floor.Coords.North - floor.Coords.South) * pixelsPerLatitude
+	pixelsPerLongitude := TileSize / coords.DLng()
+	pixelsPerLatitude := TileSize / coords.DLat()
+	newWidth := floor.Coords.DLng() * pixelsPerLongitude
+	newHeight := floor.Coords.DLat() * pixelsPerLatitude
 
 	log.Printf("Generating resized image %f %f", newWidth, newHeight)
 
