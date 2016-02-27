@@ -51,8 +51,8 @@
       "L": -123.2531605
     },
     "Address": "2053 Main Mall V6T 1Z2",
-    "Image": "http://www.maps.ubc.ca/PROD/images/photos/photo_na.gif",
-    "Description": "Henry Angus Building Classroom Addition\n        \n          2053 Main MallVANCOUVERV6T 1Z2Short Form (SIS) Name: ANGU        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - General Classroom Facilities [D] [W]- Sauder School of Business [D] [W]"
+    "Image": "http://www.maps.ubc.ca/PROD/images/photos/026_a.jpg",
+    "Description": "Henry Angus Building Addition\n        \n          2053 Main MallVANCOUVERV6T 1Z2Short Form (SIS) Name: ANGU        Related Locations\n        - Henry Angus BuildingOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - General Classroom Facilities [D] [W]- Sauder School - Graduate Society [D] [W]- Sauder School - Real Estate Devision [D] [W]- Sauder School - Undergrad Society [D] [W]- Sauder School of Business [D] [W]- UBC Information Technology [D] [W]"
   },
   {
     "name": "Anthropology and Sociology Building - Anne Wesbrook Hall",
@@ -62,8 +62,8 @@
       "L": -123.2574142
     },
     "Address": "6303 North West Marine Drive V6T 1Z1",
-    "Image": "http://www.maps.ubc.ca/PROD/images/photos/876-2_a.jpg",
-    "Description": "Anthropology and Sociology Building - Anne Wesbrook Hall\n        \n          6303 North West Marine DriveVANCOUVERV6T 1Z1Short Form (SIS) Name: ANSO        Related Locations\n        - Anthropology and Sociology Building - Anne Wesbrook Hall- Anthropology and Sociology Building - Isabel Macinnes Hall- Anthropology and Sociology Building - Mary Murrin Hall- Anthropology and Sociology BuildingOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Anthropology [D] [W]- Sociology [D] [W]"
+    "Image": "http://www.maps.ubc.ca/PROD/images/photos/876-1_a.jpg",
+    "Description": "Anthropology and Sociology Building - Isabel Macinnes Hall\n        \n          6303 North West Marine DriveVANCOUVERV6T 1Z1Short Form (SIS) Name: ANSO        Related Locations\n        - Anthropology and Sociology Building - Anne Wesbrook Hall- Anthropology and Sociology Building - Isabel Macinnes Hall- Anthropology and Sociology Building - Mary Murrin Hall- Anthropology and Sociology BuildingOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Anthropology [D] [W]- Sociology [D] [W]"
   },
   {
     "name": "Old Auditorium",
@@ -107,7 +107,7 @@
     },
     "Address": "6270 University Boulevard V6T 1Z4",
     "Image": "http://www.maps.ubc.ca/PROD/images/photos/photo_na.gif",
-    "Description": "Biological Sciences Building - Workshop\n        \n          6270 University BoulevardVANCOUVERV6T 1Z4Short Form (SIS) Name: BIOL        Related Locations\n        - Biological Sciences - Paper Recycling/Flammable Storage Facility- Biological Sciences Building - Workshop - Addition 1- Biological Sciences Building - Workshop - Addition 2Occupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Botany [D] [W]- Zoology [D] [W]"
+    "Description": "Biological Sciences Building - Workshop - Addition 1\n        \n          6270 University BoulevardVANCOUVERV6T 1Z4Short Form (SIS) Name: BIOL        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Botany [D] [W]- Zoology [D] [W]"
   },
   {
     "name": "Brock Hall - West Wing",
@@ -2776,12 +2776,12 @@
     "name": "Civil and Mechanical Engineering Laboratories",
     "sis": "CEME",
     "position": {
-      "H": 49.2631367,
-      "L": -123.2494188
+      "H": 49.2625822586851,
+      "L": -123.24897346697207
     },
     "Address": "2275 East Mall V6T 1Z4",
-    "Image": "http://www.maps.ubc.ca/PROD/images/photos/309_a.jpg",
-    "Description": "Civil and Mechanical Engineering Structures Lab\n        \n          2275 East MallVANCOUVERV6T 1Z4Short Form (SIS) Name: CEME        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Civil Engineering [D] [W]"
+    "Image": "http://www.maps.ubc.ca/PROD/images/photos/307_a.jpg",
+    "Description": "Civil and Mechanical Engineering Laboratories\n        \n          2275 East MallVANCOUVERV6T 1Z4Short Form (SIS) Name: CEME        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Civil Engineering [D] [W]- Earth, Ocean and Atmospheric Sciences [D] [W]- Mechanical Engineering [D] [W]"
   },
   {
     "name": "Chan Centre for The Performing Arts",
@@ -2813,8 +2813,8 @@
       "L": -123.2530777
     },
     "Address": "2036 Main Mall V6T 1Z1",
-    "Image": "http://www.maps.ubc.ca/PROD/images/photos/148_a.jpg",
-    "Description": "Chemistry B Block, South Wing\n        \n          2036 Main MallVANCOUVERV6T 1Z1Short Form (SIS) Name: CHEM        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Chemistry [D] [W]- General Classroom Facilities [D] [W]"
+    "Image": "http://www.maps.ubc.ca/PROD/images/photos/132_a.jpg",
+    "Description": "Chemistry D Block, Centre Wing\n        \n          2036 Main MallVANCOUVERV6T 1Z1Short Form (SIS) Name: CHEM        Related Locations\n        - Chemistry C Block, East Wing- Chemistry B Block, South Wing- Chemistry E Block, North Wing- Chemistry StorageOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Chemistry [D] [W]- General Classroom Facilities [D] [W]"
   },
   {
     "name": "C. K. Choi Building for The Institute of Asian Research",
@@ -3237,8 +3237,8 @@
     "name": "Centre for Interactive Research on Sustainability (CIRS)",
     "sis": "CIRS",
     "position": {
-      "H": 49.26206639999999,
-      "L": -123.2531443
+      "H": 49.26200561233538,
+      "L": -123.25306695111006
     },
     "Address": "2260 West Mall V6T 1Z4",
     "Image": "http://www.maps.ubc.ca/PROD/images/photos/633_a.jpg",
@@ -3252,8 +3252,8 @@
       "L": -123.2481185
     },
     "Address": "2146 Health Sciences Mall V6T 1Z3",
-    "Image": "http://www.maps.ubc.ca/PROD/images/photos/525-1_a.jpg",
-    "Description": "D.H. Copp Building Addition\n        \n          2146 Health Sciences MallVANCOUVERV6T 1Z3Short Form (SIS) Name: COPP        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Biochemistry and Molecular Biology [D] [W]- Cellular and Physiological Sciences [D] [W]- School of Kinesiology [D] [W]"
+    "Image": "http://www.maps.ubc.ca/PROD/images/photos/526_a.jpg",
+    "Description": "D.H. Copp Building Addition 2\n        \n          2146 Health Sciences MallVANCOUVERV6T 1Z3Short Form (SIS) Name: COPP        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Biochemistry and Molecular Biology [D] [W]- Cellular and Physiological Sciences [D] [W]- School of Kinesiology [D] [W]"
   },
   {
     "name": "George Cunningham Building",
@@ -3298,6 +3298,17 @@
     "Address": "6361 University Boulevard V6T 1Z2",
     "Image": "http://www.maps.ubc.ca/PROD/images/photos/320_a.jpg",
     "Description": "Dorothy Somerset Studios\n        \n          6361 University BoulevardVANCOUVERV6T 1Z2Short Form (SIS) Name: DSOM        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Art History, Visual Art \u0026 Theory [D] [W]- Theatre and Film [D] [W]"
+  },
+  {
+    "name": "Wayne and William White Engineering Design Centre",
+    "sis": "EDC",
+    "position": {
+      "H": 49.2623314,
+      "L": -123.2481694
+    },
+    "Address": "2345 East Mall V6T 1Z4",
+    "Image": "http://www.maps.ubc.ca/PROD/images/photos/301_a.jpg",
+    "Description": "Wayne and William White Engineering Design Centre\n        \n          2345 East MallVANCOUVERV6T 1Z4        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Faculty of Applied Science [D] [W]- General Study Space [D] [W]"
   },
   {
     "name": "Earth and Ocean Sciences  - Main",
@@ -3834,8 +3845,8 @@
     "name": "Earth Sciences Building",
     "sis": "ESB",
     "position": {
-      "H": 49.2627366,
-      "L": -123.2522362
+      "H": 49.2630695838498,
+      "L": -123.25216935916447
     },
     "Address": "2207 Main Mall V6T 1Z4",
     "Image": "http://www.maps.ubc.ca/PROD/images/photos/225_a.jpg",
@@ -3882,8 +3893,8 @@
       "L": -123.2460813
     },
     "Address": "2177 Wesbrook Mall V6T 1Z3",
-    "Image": "http://www.maps.ubc.ca/PROD/images/photos/525-2_a.jpg",
-    "Description": "Friedman Building Addition\n        \n          2177 Wesbrook MallVANCOUVERV6T 1Z3Short Form (SIS) Name: FRDM        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Faculty of Arts [D] [W]- Faculty of Science [D] [W]- General Classroom Facilities [D] [W]- Physical Therapy [D] [W]- School of Audiology \u0026 Speech Sciences [D] [W]"
+    "Image": "http://www.maps.ubc.ca/PROD/images/photos/523-2_a.jpg",
+    "Description": "Friedman Building\n        \n          2177 Wesbrook MallVANCOUVERV6T 1Z3Short Form (SIS) Name: FRDM        Related Locations\n        - Friedman Building AdditionOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Physical Therapy [D] [W]- School of Audiology \u0026 Speech Sciences [D] [W]- UBC Information Technology [D] [W]"
   },
   {
     "name": "Frederic Wood Theatre Addition",
@@ -3893,8 +3904,8 @@
       "L": -123.2570211
     },
     "Address": "6354 Crescent Road V6T 1Z2",
-    "Image": "http://www.maps.ubc.ca/PROD/images/photos/376-1_a.jpg",
-    "Description": "Frederic Wood Theatre Addition\n        \n          6354 Crescent RoadVANCOUVERV6T 1Z2Short Form (SIS) Name: FRWO        Related Locations\n        - Frederic Wood Theatre Addition- Frederic Wood TheatreOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Theatre and Film [D] [W]"
+    "Image": "http://www.maps.ubc.ca/PROD/images/photos/376_a.jpg",
+    "Description": "Frederic Wood Theatre\n        \n          6354 Crescent RoadVANCOUVERV6T 1Z2Short Form (SIS) Name: FRWO        Related Locations\n        - Frederic Wood Theatre- Frederic Wood Theatre AdditionOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Theatre and Film [D] [W]"
   },
   {
     "name": "Forest Sciences Centre",
@@ -6426,8 +6437,8 @@
       "L": -123.2440565
     },
     "Address": "2255 Wesbrook Mall V6T 1Z3",
-    "Image": "http://www.maps.ubc.ca/PROD/images/photos/537_a.jpg",
-    "Description": "Detwiller Pavilion 1\n        \n          2255 Wesbrook MallVANCOUVERV6T 1Z3Short Form (SIS) Name: HSCC        Related Locations\n        - Detwiller Pavilion 2Occupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Medical Genetics [D] [W]- Psychiatric Hospital [D] [W]- Psychiatry - On Campus [D] [W]"
+    "Image": "http://www.maps.ubc.ca/PROD/images/photos/537-1_a.jpg",
+    "Description": "Detwiller Pavilion 2\n        \n          2255 Wesbrook MallVANCOUVERV6T 1Z3Short Form (SIS) Name: HSCC        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Neuroscience Graduate Program [D] [W]- Pathology and Laboratory Medicine - On Campus [D] [W]- Psychiatric Hospital [D] [W]- Psychiatry - On Campus [D] [W]"
   },
   {
     "name": "Irving K. Barber Learning Centre",
@@ -11117,8 +11128,8 @@
       "L": -123.24880345659547
     },
     "Address": "2366 Main Mall V6T 1Z4",
-    "Image": "http://www.maps.ubc.ca/PROD/images/photos/165_a.jpg",
-    "Description": "Institute for Computing, Information and Cognitive Systems / Computer Science (ICICS/CS)\n        \n          2366 Main MallVANCOUVERV6T 1Z4Short Form (SIS) Name: ICCS        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Co-Op Education Applied Science [D] [W]- Computer Science [D] [W]- Electrical and Computer [D] [W]- General Study Space [D] [W]- Institute for Computing, Information and Cognitive Systems [D] [W]- Non-UBC Agency Space [D] [W]        This building can only be accessed after hours by students, faculty and staff with valid key codes."
+    "Image": "http://www.maps.ubc.ca/PROD/images/photos/166_a.jpg",
+    "Description": "Institute for Computing, Information and Cognitive Systems / Computer Science Addition (ICICS/CS)\n        \n          2366 Main MallVANCOUVERV6T 1Z4Short Form (SIS) Name: ICCS        Related Locations\n        - Institute for Computing, Information and Cognitive Systems / Computer Science Addition (ICICS/CS)- Institute for Computing, Information and Cognitive Systems / Computer Science (ICICS/CS)Occupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Computer Science [D] [W]- Food Services [D] [W]- General Study Space [D] [W]- Institute for Computing, Information and Cognitive Systems [D] [W]- Mechanical Engineering [D] [W]"
   },
   {
     "floors": [
@@ -13246,8 +13257,8 @@
     "name": "The Fred Kaiser Building",
     "sis": "KAIS",
     "position": {
-      "H": 9.294787632616154,
-      "L": -23.254732320893485
+      "H": 39.12703613908795,
+      "L": -97.89242201754345
     },
     "Address": "2332 Main Mall V6T 1Z4",
     "Image": "http://www.maps.ubc.ca/PROD/images/photos/313_a.jpg",
@@ -14697,8 +14708,8 @@
     "name": "Macleod",
     "sis": "MCLD",
     "position": {
-      "H": 49.26172322849468,
-      "L": -123.24921564332077
+      "H": 49.261755443168674,
+      "L": -123.24936909250367
     },
     "Address": "2356 Main Mall V6T 1Z4",
     "Image": "http://www.maps.ubc.ca/PROD/images/photos/312_a.jpg",
@@ -14789,8 +14800,8 @@
       "L": -123.2446718
     },
     "Address": "6108 Thunderbird Boulevard V6T 1Z3",
-    "Image": "http://www.maps.ubc.ca/PROD/images/photos/430_a.jpg",
-    "Description": "Robert F. Osborne Centre - Unit 1\n        \n          6108 Thunderbird BoulevardVANCOUVERV6T 1Z3Short Form (SIS) Name: OSBO        Related Locations\n        - Robert F. Osborne Centre - Unit 1- Robert F. Osborne Centre - Unit 2Occupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - General Classroom Facilities [D] [W]- School of Kinesiology [D] [W]"
+    "Image": "http://www.maps.ubc.ca/PROD/images/photos/431_a.jpg",
+    "Description": "Robert F. Osborne Centre - Unit 2\n        \n          6108 Thunderbird BoulevardVANCOUVERV6T 1Z3Short Form (SIS) Name: OSBO        Related Locations\n        - Robert F. Osborne Centre - Unit 1- Robert F. Osborne Centre - Unit 2Occupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - School of Kinesiology [D] [W]"
   },
   {
     "name": "John Owen Pavilion and Allan Mcgavin Sports Medicine Centre",
@@ -15031,8 +15042,8 @@
       "L": -123.2489204
     },
     "Address": "2613 West Mall V6T 1Z4",
-    "Image": "http://www.maps.ubc.ca/PROD/images/photos/668_a.jpg",
-    "Description": "Totem Field Studios\n        \n          2613 West MallVANCOUVERV6T 1Z4Short Form (SIS) Name: TFS        Related Locations\n        - Totem Field Studios AdditionOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Linguistics [D] [W]        This building is within a gated area that is often located.  When the gate is locked there is no access to the building."
+    "Image": "http://www.maps.ubc.ca/PROD/images/photos/photo_na.gif",
+    "Description": "Totem Field Studios Addition\n        \n          2613 West MallVANCOUVERV6T 1Z4Short Form (SIS) Name: TFS        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Linguistics [D] [W]"
   },
   {
     "name": "Doug Mitchell Thunderbird Sports Centre",

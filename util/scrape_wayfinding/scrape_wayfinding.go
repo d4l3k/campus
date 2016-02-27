@@ -18,6 +18,10 @@ var (
 	apiKey  = flag.String("key", "", "the google maps api key for geocoding")
 	scrape  = flag.Bool("scrape", false, "whether to scrape or not")
 	geocode = flag.Bool("geocode", false, "whether to geocode or not")
+
+	customSIS = map[string]string{
+		"Wayne and William White Engineering Design Centre": "EDC",
+	}
 )
 
 func fetchDetails(rel <-chan string, out chan *models.Building) {
@@ -89,6 +93,9 @@ func scrapeBuildings() error {
 	}()
 	var scrapedBuildings []*models.Building
 	for b := range outChan {
+		if len(b.SIS) == 0 {
+			b.SIS = customSIS[b.Name]
+		}
 		scrapedBuildings = append(scrapedBuildings, b)
 		if len(scrapedBuildings) == len(details) {
 			break
