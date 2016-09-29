@@ -337,23 +337,20 @@ func (s *Server) search(w http.ResponseWriter, r *http.Request) {
 	if idx, ok := s.idIndex[q]; ok {
 		results = append(results, idx)
 	} else {
-		var queryShould []bleve.Query
+		query := bleve.NewBooleanQuery()
 		if len(q) > 0 {
 			/*fuzzy_query := bleve.NewFuzzyQuery(q)
 			fuzzy_query.FuzzinessVal = 3
 			queryShould = append(queryShould, fuzzy_query)
 			queryShould = append(queryShould, bleve.NewRegexpQuery("[a-zA-Z0-9_]*"+q+"[a-zA-Z0-9_]*"))
 			queryShould = append(queryShould, bleve.NewQueryStringQuery(q))*/
-			queryShould = append(queryShould, bleve.NewQueryStringQuery(q))
+			query.AddShould(bleve.NewQueryStringQuery(q))
 		}
 
-		var queryMust []bleve.Query
 		if typeFilter != "all" {
 			termQuery := bleve.NewTermQuery(typeFilter)
-			queryMust = append(queryMust, termQuery)
+			query.AddMust(termQuery)
 		}
-
-		query := bleve.NewBooleanQuery(queryMust, queryShould, nil)
 
 		searchRequest := bleve.NewSearchRequest(query)
 		searchRequest.Size = 25
