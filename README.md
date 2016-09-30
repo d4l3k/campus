@@ -2,6 +2,11 @@
 
 A interactive map for UBC.
 
+## Run on docker (port 8080)
+```bash
+docker run --restart=always -d -p 8080:8383 d4l3k/campus
+```
+
 ## Inspiration
 
 The existing "wayfinding" site for the University of British Columbia is awful, and thus a more modern replacement is needed. This is designed to be similar to the amazing internal Google app "Campus".
