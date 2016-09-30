@@ -5,5 +5,5 @@ RUN apt-get install -y nodejs
 
 # Install bower
 RUN npm install -g bower vulcanize
-RUN bower install
+RUN bower install --allow-root
 RUN vulcanize static/app.html > static/index.html
