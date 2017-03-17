@@ -13287,6 +13287,86 @@
     "Description": "Frederic Lasserre Building\n        \n          6333 Memorial RoadVANCOUVERV6T 1Z2Short Form (SIS) Name: LASR        Related Locations\n        - n/aOccupant(s)\n        Search for related Web Site [W] and Directory [D] information by clicking the appropriate link below, or see the UBC.ca site's list of A\n          to Z UBC Web Sites.\n      - Art History, Visual Art \u0026 Theory [D] [W]- Building Operations [D] [W]- General Classroom Facilities [D] [W]- School of Architecture and Landscape Architecture [D] [W]- School of Community and Regional Planning [D] [W]- School of Music [D] [W]- Theatre and Film [D] [W]"
   },
   {
+    "floors": [
+      {
+        "floor": "1",
+        "coords": {
+          "north": 49.263164534815694,
+          "south": 49.261953263095386,
+          "east": -123.24400931596756,
+          "west": -123.24610143899918
+        },
+        "image": "static/maps/lsc/lsc.png",
+        "rooms": [
+          {
+            "id": "1",
+            "sis": "LSC",
+            "position": {
+              "H": 49.26253944478492,
+              "L": -123.2458148273578
+            },
+            "rel_position": {
+              "H": 0.1578082191780822,
+              "L": 0.1299353912419239
+            },
+            "floor": "1"
+          },
+          {
+            "id": "2",
+            "sis": "LSC",
+            "position": {
+              "H": 49.26276599963961,
+              "L": -123.24523391361113
+            },
+            "rel_position": {
+              "H": 0.1578082191780822,
+              "L": 0.501794687724336
+            },
+            "floor": "1"
+          },
+          {
+            "id": "Multi-Purpose Lab",
+            "sis": "LSC",
+            "position": {
+              "H": 49.262994164749685,
+              "L": -123.24465291085708
+            },
+            "rel_position": {
+              "H": 0.1558599695585997,
+              "L": 0.8743718592964824
+            },
+            "floor": "1"
+          },
+          {
+            "id": "West Atrium",
+            "sis": "LSC",
+            "position": {
+              "H": 49.26234836692835,
+              "L": -123.24526248478915
+            },
+            "rel_position": {
+              "H": 0.6604566210045663,
+              "L": 0.31299353912419237
+            },
+            "floor": "1"
+          },
+          {
+            "id": "East Atrium",
+            "sis": "LSC",
+            "position": {
+              "H": 49.262575219944665,
+              "L": -123.24468484640043
+            },
+            "rel_position": {
+              "H": 0.6585083713850837,
+              "L": 0.6834170854271356
+            },
+            "floor": "1"
+          }
+        ],
+        "rotation": -0.53
+      }
+    ],
     "name": "Life Sciences Centre",
     "sis": "LSC",
     "position": {
