@@ -59,6 +59,7 @@ floor-box {
   </template>
 
   <script>
+"use strict";
 Polymer({
   is: "main-app",
   properties: {
@@ -122,25 +123,35 @@ Polymer({
     self.floor = '1';
   },
   coords: function() {
-    this.map.overlayMapTypes.clear();
-    this.refreshTiles();
+    //this.map.overlayMapTypes.clear();
+    //this.refreshTiles();
     var i = 0;
     var lats = [];
     var lngs = [];
-    this.map.addListener('click', function(e) {
-      if (i >= 4) {
-        return;
-      }
+    this.map.addListener('click', (e) => {
       lats.push(e.latLng.lat());
       lngs.push(e.latLng.lng());
       i++;
       if (i >= 4) {
-        console.log(JSON.stringify({
+        var bounds = {
           north: Math.max.apply(0, lats),
           south: Math.min.apply(0, lats),
           east: Math.max.apply(0, lngs),
           west: Math.min.apply(0, lngs),
-        }));
+        };
+        if (this.rectangle) {
+          this.rectangle.setMap(null);
+        }
+        this.rectangle = new google.maps.Rectangle({
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35,
+          map: this.map,
+          bounds: bounds
+        });
+        console.log(JSON.stringify(bounds));
       }
     });
   },
